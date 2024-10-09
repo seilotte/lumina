@@ -2,8 +2,13 @@
 
 <p align = "center">A peformance-oriented shader for Minecraft.</p>
 
-![image0](images/a.png)
-![image1](images/b.png)
+<div align="center">
+    <img src="images/a.png" alt="image0">
+</div>
+
+<div align="center">
+    <img src="images/b.png" alt="image1">
+</div>
 
 ## Installation
 
