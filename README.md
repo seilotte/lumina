@@ -34,7 +34,7 @@ This shader was developed using the following versions:
 
 ## Credits
 
-Credits are included within the code using the following format:
+Included within the code using the following format:
 
 ```
 // [Author(s)] link
