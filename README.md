@@ -3,11 +3,11 @@
 <p align = "center">A peformance-oriented shader for Minecraft.</p>
 
 <div align="center">
-    <img src="images/a.png" alt="image0">
+    <img src="images/a.webp" alt="image0">
 </div>
 
 <div align="center">
-    <img src="images/b.png" alt="image1">
+    <img src="images/b.webp" alt="image1">
 </div>
 
 ## Installation
