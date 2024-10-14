@@ -209,7 +209,8 @@ void main()
 
         float NoL = dot(normal, c_shadowLightDirection) * 0.5f + 0.5f;
         float shadows = float(NoL > 0.255f);
-        shadows = 1.0f;
+
+
 
         #if defined MAP_SHADOW || defined SS_SHADOWS \
         || defined FOG_WATER || defined FOG
@@ -228,6 +229,7 @@ void main()
 
         #endif
         #endif
+
 
 
         #if defined MAP_SHADOW || defined SS_SHADOW || defined FOG

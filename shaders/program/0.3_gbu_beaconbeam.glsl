@@ -93,7 +93,7 @@ void main()
     col0 = texture(gtexture, uv) * vcol;
 
     // WRITE: normals.rg, uv_lightmap.b, stencil.a
-    col5= vec4(0.0f, 0.0f, 0.0f, s_BEACONBEAM);
+    col5 = vec4(0.0f, 0.0f, 0.0f, s_BEACONBEAM);
 }
 
 #endif

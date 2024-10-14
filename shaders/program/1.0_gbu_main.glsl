@@ -110,6 +110,7 @@ in mat3 tbn;
 
 uniform int renderStage;
 uniform float far;
+uniform vec4 entityColor;
 
 // lighting
 uniform float nightVision;

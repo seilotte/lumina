@@ -192,6 +192,11 @@
 
     #endif
 
+    col0.rgb = mix(
+        col0.rgb,
+        entityColor.rgb,
+        entityColor.a < 0.9f ? entityColor.a : 0.0f
+    );
     col0.a = 1.0f;
 
     if (stencil == s_LIGHTNING_BOLT) col0 = vec4(1.0f);
