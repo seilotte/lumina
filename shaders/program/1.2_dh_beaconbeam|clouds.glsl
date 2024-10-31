@@ -58,17 +58,16 @@ void main()
 
 
 
-    #ifdef REF
+    #ifndef RENDER_BEACON_BEAMS
 
-        if (dhMaterialId == DH_BLOCK_METAL) stencil = s_METALLIC;
+        // NOTE: This is wrong, for further information look at the
+        // defined macros in iris... But it works.
+        // common/src/main/java/net/irisshaders/iris/gl/shader/StandardMacros.java
+        if (dhMaterialId == -13) return;
 
-    #endif
+    #else
 
-
-
-    #ifdef MAP_SPECULAR
-
-        if (dhMaterialId == DH_BLOCK_ILLUMINATED) stencil = s_EMISSIVE;
+        stencil = float(dhMaterialId == -13); // is_beaconbeam
 
     #endif
 
@@ -147,8 +146,9 @@ uniform float dhFarPlane;
 
 
 
-/* RENDERTARGETS: 0 */
+/* RENDERTARGETS: 0,5 */
 layout(location = 0) out vec4 col0; // c_final.rgb
+layout(location = 1) out vec4 col5; // normals.rg, uv_lightmap.b, stencil.a
 
 void main()
 {
@@ -162,6 +162,7 @@ void main()
 
     // Initialize values.
 //     col0 = vec4(.0f);
+//     col5 = vec4(.0f);
 
     float dither = noise_r2(gl_FragCoord.xy);
 
@@ -217,6 +218,9 @@ void main()
 
     // WRITE: c_final.rgb
 //     col0 = col0;
+
+    // WRITE: normals.rg, uv_lightmap.b, stencil.a
+    col5 = vec4(0.0f, 0.0f, 0.0f, stencil);
 }
 
 #endif
