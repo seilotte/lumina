@@ -1,0 +1,4 @@
+#define VSH
+#define G_LIGHTNING
+
+#include "/programme/gbuffers/_emissive.glsl"

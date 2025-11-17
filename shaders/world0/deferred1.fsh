@@ -1,6 +1,3 @@
 #define FSH
-#define OVERWORLD
-#define DEFERRED
 
-#include "/program/version.glsl"
-#include "/program/1.5_def1_shadows|material.glsl"
+#include "/programme/composites/d1_shading.glsl"

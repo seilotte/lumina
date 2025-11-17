@@ -1,0 +1,134 @@
+# §0: Black
+# §1: Dark Blue
+# §2: Dark Green
+# §3: Dark Aqua
+# §4: Dark Red
+# §5: Dark Purple
+# §6: Gold
+# §7: Grey
+# §8: Dark Grey
+# §9: Blue
+# §a: Green
+# §b: Aqua
+# §c: Red
+# §d: Light Purple
+# §e: Yellow
+# §f: White
+
+# =========
+
+screen.TEXTURES = Textures
+screen.SHADER = Shader
+screen.MISCELLANEOUS = Miscellaneous
+screen.DEBUG = §7Debug
+
+# =========
+
+# [Textures]
+option.MAP_ALBEDO = §6Albedo Map
+option.MAP_SPECULAR = §6Specular Map
+option.MAP_NORMAL = §6Normal Map
+option.MAP_NORMAL_WATER = §6Water Normal Map
+option.MAP_SHADOW = §6Shadow Map
+    option.shadowMapResolution = Resolution
+        suffix.shadowMapResolution = ²
+    option.shadowDistance = Distance
+        value.shadowDistance.16.0 = 1 chunk
+        value.shadowDistance.32.0 = 2 chunks
+        value.shadowDistance.48.0 = 3 chunks
+        value.shadowDistance.64.0 = 4 chunks
+        value.shadowDistance.80.0 = 5 chunks
+        value.shadowDistance.96.0 = 6 chunks
+    option.sunPathRotation = Sun Path Rotation
+        suffix.sunPathRotation = °
+
+# [Shader]
+    # ambient
+option.AO_VANILLA = §6Vanilla Ambient Occlusion
+    value.AO_VANILLA.0 = §cOff
+    value.AO_VANILLA.1 = §fOn
+option.SS_AO = §6Screen-Space Ambient Occlusion
+    option.SS_AO_RES = Resolution §7| GI AO SS
+        value.SS_AO_RES.0.25 = 25%
+        value.SS_AO_RES.0.5 = 50%
+        value.SS_AO_RES.1.0 = 100%
+    option.SS_AO_DIRS = Directions §7| GI AO SS
+    option.SS_AO_ITERS = Iterations §7| GI AO SS
+    option.SS_AO_ACCUM = Denoise §7| GI AO SS
+    option.SS_AO_MODE = Mode
+        value.SS_AO_MODE.0 = SSAO
+        value.SS_AO_MODE.1 = GTAO
+option.SS_GI = §6Screen-Space Global Illuination
+
+    # shadows
+option.SS_SHADOWS = §6Screen-Space Shadows
+    option.SS_SHADOWS_ITERS = Iterations
+option.CLOUDS_SHADOWS = §6Clouds Shadows
+
+    # lights
+option.LIGHTS_HAND = §6Dynamic Hand Lights
+    option.LIGHTS_HAND_COLOURED = Coloured
+option.LIGHTS_COLOURED = §6Screen-Space Coloured Lights
+
+    # reflections
+option.SS_R = §6Screen-Space Reflections
+    option.SS_R_RES = Resolution §7| LC SSR
+        value.SS_R_RES.0.25 = 25%
+        value.SS_R_RES.0.5 = 50%
+        value.SS_R_RES.1.0 = 100%
+    option.SS_R_ITERS = Iterations §7| LC SSR
+    option.SS_R_MODE = Mode
+        value.SS_R_MODE.0 = Project §7(fast)
+        value.SS_R_MODE.1 = Ray March §7(slow)
+
+    # environment
+option.FOG_BORDER = §6Fog
+option.FOG_HEIGHT = §6Height Fog
+option.FOG_WATER = §6Water Fog
+option.FOG_CLOUDS = §6Clouds Fog
+    option.CLOUDS_RENDER_DISTANCE = Distance
+        value.CLOUDS_RENDER_DISTANCE.32.0 = 2 chunks
+        value.CLOUDS_RENDER_DISTANCE.64.0 = 4 chunks
+        value.CLOUDS_RENDER_DISTANCE.128.0 = 8 chunks
+        value.CLOUDS_RENDER_DISTANCE.256.0 = 16 chunks
+        value.CLOUDS_RENDER_DISTANCE.512.0 = 32 chunks
+        value.CLOUDS_RENDER_DISTANCE.1024.0 = 64 chunks
+        value.CLOUDS_RENDER_DISTANCE.2048.0 = 128 chunks
+
+# [Miscellaneous]
+option.DIS_FOLLIAGE = §6Folliage Displacement
+option.DIS_WATER = §6Water Displacement
+option.PIXELATE = §6Pixelate
+option.TAA = §6Temporal Anti-Aliasing
+    option.TAA_MOTION_BLUR = Motion Blur
+option.SEPARATE_ENTITIES_DRAWS = §6Separate Entity Draws
+option.WHITE_WORLD = §6White World
+
+# [Debug]
+option.DEBUG = §6Debug
+    option.DEBUG_MODE = Debug Mode
+        value.DEBUG_MODE.-1 = none
+        value.DEBUG_MODE.0 = §70 §ffinal
+        value.DEBUG_MODE.1 = §71 §fdiffuse, alpha
+        value.DEBUG_MODE.90 = §790 §fsky
+        value.DEBUG_MODE.80 = §780 §fcoloured_lights
+        value.DEBUG_MODE.70 = §770 §fdata
+        value.DEBUG_MODE.71 = §771 §fdata.normal_ft
+        value.DEBUG_MODE.72 = §772 §fdata.uv_lightmap.x
+        value.DEBUG_MODE.73 = §773 §fdata.uv_lightmap.y
+        value.DEBUG_MODE.74 = §774 §fdata.is_emissive
+        value.DEBUG_MODE.75 = §775 §fdata.is_metal
+        value.DEBUG_MODE.60 = §760 §fdepth
+        value.DEBUG_MODE.61 = §761 §fpos_vs_pixelated
+        value.DEBUG_MODE.50 = §750 §fambient_occlusion
+        value.DEBUG_MODE.51 = §751 §fscreen_space_shadows
+        value.DEBUG_MODE.52 = §752 §fpixel_age
+        value.DEBUG_MODE.40 = §740 §fglobal_illumination
+        value.DEBUG_MODE.30 = §730 §freflections
+        value.DEBUG_MODE.31 = §731 §freflections_mask
+option.RENDER_OPAQUE = §6Render Opaque
+option.RENDER_TRANSLUCENT = §6Render Translucent
+option.RENDER_OPAQUE_VX = §6Render Opaque Voxy
+option.RENDER_TRANSLUCENT_VX = §6Render Translucent Voxy
+option.RENDER_CLOUDS = §6Render Clouds
+option.RENDER_BEACONBEAMS = §6Render Beacon Beams

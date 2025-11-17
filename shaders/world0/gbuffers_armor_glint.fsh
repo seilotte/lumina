@@ -1,5 +1,4 @@
 #define FSH
-#define OVERWORLD
+#define G_ARMOR_GLINT
 
-#include "/program/version.glsl"
-#include "/program/0.2_gbu_glint.glsl"
+#include "/programme/gbuffers/armor_glint.glsl"

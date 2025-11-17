@@ -1,5 +1,4 @@
 #define FSH
-#define OVERWORLD
+#define G_SKYBASIC
 
-#include "/program/version.glsl"
-#include "/program/0.1_gbu_skybasic.glsl"
+#include "/programme/gbuffers/skybasic.glsl"

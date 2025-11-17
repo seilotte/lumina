@@ -1,135 +1,245 @@
 /*
-const int colortex0Format = RGB8;       // c_final.rgb
-const int colortex4Format = RGB8;       // c_sky.rgb
-const int colortex5Format = RGBA8;      // normals.rg, uv_lightmap.b, stencil.a
-const int colortex6Format = RGB5_A1;    // c_emissivet.rgb, m_emissivet.a
-const int colortex7Format = RGBA8;      // ssgi.rgb, ssao.a
-const int colortex8Format = RGB8;       // c_lights.rgb
-const int colortex9Format = RGB8;       // c_taa.rgb
+    colortex0 | RGBA8
+[rgb][3x8] albedo.rgb -> final.rgb
+[a][1x8] diffuse
 
-// c = colour; m = mask; emissivet = emissive_translucents;
-// ss = screen space; taa = temporal...
+    colortex2 | RGB8
+[rgb][3x8] final_prev.rgb
+
+    colortex9 | RGB8
+[rgb][3x8] sky.rgb
+
+    colortex8 | R11F_G11F_B10F | 50% resolution
+[rgb][] coloured_lights.rgb
+
+    colortex7 | R32UI
+[r][666] normals.rgb
+[r][5] uv_lightmap.x
+[r][5] uv_lightmap.y
+[r][3] is_emissive
+[r][1] is_metal
+
+    colortex6 | RGBA32F
+[r][1x32F] depth.r
+[gba][3x32F] pos_vs_pixelated.rgb
+
+    colortex5 | RGB8 | 50% resolution
+[r][8] ao
+[g][8] shadows
+[b][8] pixel_age
+
+    colortex4 | RGB8 | 50% resolution
+[rgb][3x8] gi
+
+    colortex3 | RGBA8 | 50% resolution
+[rgb][3x8] reflections.rgb
+[a][8] reflections_mask
+
+
+    colortex1 | R8
+[a][1x8] alpha (translucent)
+
+    colortex10 | RGB8
+[rgb][3x8] final.rgb (translucent)
+
+    colortex17 | R32UI
+[r][666] normals.rgb (translucent)
+[r][5] -
+[r][5] -
+[r][3] is_emissive
+[r][1] is_metal
+
+    colortex16 | RGBA32F
+[r] [1x32F] depth.r (translucent)
+[gba][3x32F] pos_vs_pixelated.rgb (translucent)
+
 */
 
-const bool colortex0Clear = false;
-const bool colortex4Clear = false;
-const bool colortex5Clear = false;
-const bool colortex6Clear = false;
-const bool colortex7Clear = false;
+#if defined G_FINAL
+
+/*
+const int colortex0Format = RGBA8;
+const int colortex2Format = RGB8;
+const int colortex9Format = RGB8;
+const int colortex8Format = R11F_G11F_B10F;
+const int colortex7Format = R32UI;
+const int colortex6Format = RGBA32F;
+const int colortex5Format = RGB8;
+// const int colortex4Format = RGB8;
+const int colortex3Format = RGBA8;
+
+const int colortex1Format = R8;
+const int colortex10Format = RGB8;
+const int colortex17Format = R32UI;
+const int colortex16Format = RGBA32F;
+
+// const bool colortex0Clear = false;
+const bool colortex2Clear = false;
+// const bool colortex9Clear = false;
 const bool colortex8Clear = false;
-const bool colortex9Clear = false;
+// const bool colortex7Clear = false;
+// const bool colortex6Clear = false;
+const bool colortex5Clear = false;
+// const bool colortex4Clear = false;
+// const bool colortex3Clear = false;
 
-// const vec4 colortex0ClearColor = vec4(0.0, 0.0, 0.0, 1.0);
-// const vec4 colortex4ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
-// const vec4 colortex5ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
-// const vec4 colortex6ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
-// const vec4 colortex7ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+// const bool colortex1Clear = false;
+// const bool colortex10Clear = false;
+// const bool colortex17Clear = false;
+// const bool colortex16Clear = false;
+
+const vec4 colortex0ClearColor = vec4(0.0, 0.0, 0.0, 1.0);
+// const vec4 colortex2ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+const vec4 colortex9ClearColor = vec4(0.0, 0.0, 0.0, 1.0);
 // const vec4 colortex8ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
-// const vec4 colortex9ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+const vec4 colortex7ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+const vec4 colortex6ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+// const vec4 colortex5ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+const vec4 colortex4ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+const vec4 colortex3ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+
+const vec4 colortex1ClearColor = vec4(1.0, 0.0, 0.0, 1.0);
+const vec4 colortex10ClearColor = vec4(0.0, 0.0, 0.0, 1.0);
+const vec4 colortex17ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+const vec4 colortex16ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
+*/
+
+#endif
 
 // =========
 
-// Stencil; 8-bits [0-255]
-#define s_WATER             0.2     // 051/255
-#define s_WATER_CAULDRON    0.202   // 051/255; buffer rounds
-#define s_METALLIC          0.6     // 153/255
-#define s_EMISSIVE          0.8     // 204/255
-#define s_NETHER_PORTAL     0.802   // 204/255; buffer rounds
-#define s_LIGHTNING_BOLT    1.0     // 255/255
-#define s_BEACONBEAM        1.0     // 255/255
-#define s_SKY               1.0     // 255/255
+// NOTE: I am lazy...
+#define gMV gbufferModelView
+#define gMVInv gbufferModelViewInverse
+#define gPrevMV gbufferPreviousModelView
+#define gProj gbufferProjection
+#define gProjInv gbufferProjectionInverse
+#define gPrevProj gbufferPreviousProjection
+
+#define sProj shadowProjection
+#define sProjInv shadowProjectionInverse
+#define sMV shadowModelView
+#define sMVInv shadowModelViewInverse
+
+#define mMV modelViewMatrix
+#define mMVInv modelViewMatrixInverse
+#define mProj projectionMatrix
+#define mProjInv projectionMatrixInverse
+#define mNor normalMatrix
 
 // =========
 
-// #define DEBUG // enables composite99
+// ID's; 16-bit [-32768, 32767]; <file>.properties
+#define i_LIGHTNING_BOLT    1
+#define i_WATER             2
+#define i_WATER_CAULDRON    3
+#define i_WIND              100
+#define i_EMISSION          200
+#define i_METALLIC          300
 
-
-
-// [Displacement]
-#define DIS_FOLLIAGE
-    #define DIS_FOLLIAGE_STRENGTH       0.0002  // [0.0001 0.0002 0.0003]
-    #define DIS_FOLLIAGE_SPEED          1.0     // [1.0 2.0 3.0 4.0 5.0]
-#define DIS_WATER
-    #define DIS_WATER_STRENGTH          0.05    // [0.0125 0.025 0.05]
-    #define DIS_WATER_SPEED             2.0     // [1.0 2.0 3.0 4.0 5.0]
-
+// =========
 
 // [Textures]
 #define MAP_ALBEDO
 #define MAP_SPECULAR
-#define MAP_NORMAL
+
+// #define MAP_NORMAL
 #define MAP_NORMAL_WATER
-    #define MAP_NORMAL_WATER_STRENGTH   0.01    // [0.01 0.03 0.06 0.09]
-    #define MAP_NORMAL_WATER_SPEED      0.05    // [0.025 0.05 0.075 0.1]
 
-
-// [Material] Albedo.
-#define ALBEDO
-#define VCOL // vertex_colour
-#define DH_VCOL_NOISE
-    #define DH_VCOL_NOISE_SIZE          0.0625  // [0.015625 0.03125 0.0625 0.125] 1px 2px 4px 8px
-
-// [Material] Specular.
-#define SPECULAR
-
-// [Material] Ambient.
-#define AMBIENT
-    #define AMBIENT_INTENSITY           0.3     // [0.1 0.2 0.3 0.4 0.5]
-#define SS_GI // global_illumination
-#define SS_AO // ambient_occlusion
-    #define SS_GIAOCL_RESOLUTION        0.499   // [0.25 0.499 0.75 1.0]
-    #define SS_GIAOCL_ITERATIONS        4       // [2 4 8 16]
-    #define SS_GIAOCL_RADIUS            -500.0  // [-100.0 -200.0 -300.0 -400.0 -500.0]
-const float ambientOcclusionLevel =     0.0;    // [0.0 1.0]
-
-// [Material] Diffuse.
-#define DIFFUSE
-    #define DIFFUSE_INTENSITY           1.0     // [1.0 1.1 1.2 1.3 1.4 1.5]
 #define MAP_SHADOW
-    #define MAP_SHADOW_PIXEL            0.0     // [0.0 4.0 8.0 16.0 32.0 64.0]
-    const int shadowMapResolution =     256;    // [256 512 1024 2048 4096]
-    const float shadowDistance =        32.0;   // [16.0 32.0 48.0 64.0 80.0 96.0]
+    const int shadowMapResolution = 256; // [256 512 1024 2048 4096]
+    const float shadowDistance = 32.0; // [16.0 32.0 48.0 64.0 80.0 96.0]
     const float shadowDistanceRenderMul = 1.0;
+    const float sunPathRotation = -10.0; // [-90.0 -30.0 -10.0 0.0 10.0 30.0 90.0]
+
+// [Shader]
+    // ambient
+#define AO_VANILLA 0 // [0 1]
+    const float ambientOcclusionLevel = AO_VANILLA;
+
+#define SS_AO
+    #define SS_AO_RES 0.5 // [0.25 0.5 1.0]
+    #define SS_AO_DIRS 1 // [1 2 3 4]
+    #define SS_AO_ITERS 8 // [4 8 12 16]
+    #define SS_AO_ACCUM
+    #define SS_AO_MODE 1 // [0 1] 0=ssao, 1=gtao
+#define SS_GI
+    // #define SS_GI_RES SS_AO_RES
+    // #define SS_GI_DIRS SS_AO_DIRS
+    // #define SS_GI_ITERS SS_AO_ITERS
+    // #define SS_GI_ACCUM SS_AO_ACCUM
+    // #define SS_GI_MODE SS_AO_MODE
+
+    // shadows
 #define SS_SHADOWS
-    #define SS_SHADOWS_ITERATIONS        6      // [2 4 6 8 16]
-    #define SS_SHADOWS_STRIDE            8.0    // [2.0 4.0 8.0 16.0]
-const float sunPathRotation =            -10.0; // [-90.0 -30.0 -10.0 0.0 10.0 30.0 90.0]
+    // #define SS_SHADOWS_RES SS_AO_RES
+    #define SS_SHADOWS_ITERS 12 // [4 8 12 16]
+    // #define SS_SHADOWS_ACCUM SS_AO_ACCUM
 
-// [Material] Lights.
+#define CLOUDS_SHADOWS
+
+    // lights
 #define LIGHTS_HAND
-#define SS_CL // lights_coloured
-    #define LIGHTS_INTENSITY            2.0     // [1.0 1.5 2.0]
+    #define LIGHTS_HAND_COLOURED
+#define LIGHTS_COLOURED
+    // #define LIGHTS_COLOURED_RES SS_R_RES
 
-// [Material] Reflections.
-#define REF
-    #define REF_INTENSITY               0.6     // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
-#define REF_WATER
-    #define REF_WATER_INTENSITY         0.9     // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+    // reflections
+#define SS_R
+    #define SS_R_RES 0.5 // [0.25 0.5 1.0]
+    #define SS_R_ITERS 12 // [4 8 12 16]
+    #define SS_R_MODE 0 // [0 1] 0=project, 1=raymarch
 
-
-// [Environment]
-#define FOG
-    #define FOG_STRENGTH                0.125   // [0.03125 0.0625 0.125 0.25 0.5]
+    // environment
+#define FOG_BORDER
+#define FOG_HEIGHT
 #define FOG_WATER
-    #define FOG_WATER_STRENGTH          0.5     // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
+#define FOG_CLOUDS
+    #define CLOUDS_RENDER_DISTANCE 2048.0 // [32.0 64.0 128.0 256.0 512.0 1024.0 2048.0]
 
-#define CLOUDS                          2       // [0 1 2]
-    #define CLOUDS_GRADIENT
-//    #define RENDER_CLOUDS_VANILLA
 
-// [Post]
-#define TAA // temporal_anti-aliasing
-    #define TAA_FAC                     0.1     // [0.1 0.2 0.3 0.4 0.5]
-// #define VHS // vhs_filter
-    #define VHS_TYPE                    0       // [0 1] 0 = NTSC; 1 = PAL
-//    #define VHS_DOWNSCALE
 
 // [Miscellaneous]
-#define RENDER_TERRAIN
-#define RENDER_BEACON_BEAMS
-#define RENDER_DISTANT_HORIZONS
+#define DIS_FOLLIAGE
+#define DIS_WATER
 
-#define TRANSPARENT_WATER_CAULDRON
+#define PIXELATE
+// #define TAA
+    #define TAA_MOTION_BLUR
+
+#define SEPARATE_ENTITIES_DRAWS
+// #define WHITE_WORLD
+
+
+
+// [Debug]
+// #define DEBUG
+    #define DEBUG_MODE 0 // [-1 0 1 90 80 70 71 72 73 74 75 60 61 40 50 51 52 30 31]
+
+#define RENDER_OPAQUE
+#define RENDER_TRANSLUCENT
+#define RENDER_OPAQUE_VX
+#define RENDER_TRANSLUCENT_VX
+
+#define RENDER_CLOUDS fancy // [off fast fancy]
+#define RENDER_BEACON_BEAMS
+
+// =========
+
+#if !defined VOXY || \
+(!defined RENDER_OPAQUE_VX && !defined RENDER_TRANSLUCENT_VX) \
+
+    #if defined VOXY
+        #undef VOXY
+    #endif
+
+    #if defined vxFar
+        #undef vxFar
+    #endif
+
+    #define vxFar far // always
+
+#endif
 
 // =========
 
@@ -137,18 +247,8 @@ const float sunPathRotation =            -10.0; // [-90.0 -30.0 -10.0 0.0 10.0 3
 #ifdef DEBUG
 #endif
 
-#ifdef DIS_FOLLIAGE
-#endif
-#ifdef DIS_FOLLIAGE_STRENGTH
-#endif
-#ifdef DIS_FOLLIAGE_SPEED
-#endif
-#ifdef DIS_WATER
-#endif
-#ifdef DIS_WATER_STRENGTH
-#endif
-#ifdef DIS_WATER_SPEED
-#endif
+
+
 #ifdef MAP_ALBEDO
 #endif
 #ifdef MAP_SPECULAR
@@ -157,87 +257,92 @@ const float sunPathRotation =            -10.0; // [-90.0 -30.0 -10.0 0.0 10.0 3
 #endif
 #ifdef MAP_NORMAL_WATER
 #endif
-#ifdef MAP_NORMAL_WATER_STRENGTH
+#ifdef MAP_SHADOW
 #endif
-#ifdef ALBEDO
-#endif
-#ifdef VCOL
-#endif
-#ifdef DH_VCOL_NOISE
-#endif
-#ifdef DH_VCOL_NOISE_PIXELATE
-#endif
-#ifdef SPECULAR
-#endif
-#ifdef AMBIENT
-#endif
-#ifdef AMBIENT_INTENSITY
-#endif
-#ifdef SS_GI
+
+#ifdef AO_VANILLA
 #endif
 #ifdef SS_AO
 #endif
-#ifdef SS_GIAOCL_RESOLUTION
+    #ifdef SS_AO_RES
+    #endif
+    #ifdef SS_AO_DIRS
+    #endif
+    #ifdef SS_AO_ITERS
+    #endif
+    #ifdef SS_AO_ACCUM
+    #endif
+    #ifdef SS_AO_MODE
+    #endif
+#ifdef SS_GI
 #endif
-#ifdef SS_GIAOCL_ITERATIONS
-#endif
-#ifdef SS_GIAOCL_RADIUS
-#endif
-#ifdef DIFFUSE
-#endif
-#ifdef DIFFUSE_INTENSITY
-#endif
-#ifdef MAP_SHADOW
-#endif
-#ifdef MAP_SHADOW_PIXEL
+
+#ifdef CLOUDS_SHADOWS
 #endif
 #ifdef SS_SHADOWS
 #endif
-#ifdef SS_SHADOWS_ITERATIONS
+    #ifdef SS_SHADOWS_ITERS
+    #endif
+
+#ifdef LIGHTS_COLOURED
 #endif
-#ifdef SS_SHADOWS_STRIDE
-#endif
+    #ifdef LIGHTS_COLOURED_RES
+    #endif
 #ifdef LIGHTS_HAND
 #endif
-#ifdef SS_CL
+    #ifdef LIGHTS_HAND_COLOURED
+    #endif
+
+#ifdef SS_R
 #endif
-#ifdef LIGHTS_INTENSITY
+    #ifdef SS_R_RES
+    #endif
+    #ifdef SS_R_ITERS
+    #endif
+    #ifdef SS_R_MODE
+    #endif
+
+#ifdef FOG_BORDER
 #endif
-#ifdef REF
-#endif
-#ifdef REF_INTENSITY
-#endif
-#ifdef REF_WATER
-#endif
-#ifdef REF_WATER_INTENSITY
-#endif
-#ifdef FOG
-#endif
-#ifdef FOG_STRENGTH
+#ifdef FOG_HEIGHT
 #endif
 #ifdef FOG_WATER
 #endif
-#ifdef FOG_WATER_STRENGTH
+#ifdef FOG_CLOUDS
 #endif
-#ifdef CLOUDS
+    #ifdef CLOUDS_RENDER_DISTANCE
+    #endif
+
+#ifdef DIS_FOLLIAGE
 #endif
-#ifdef CLOUDS_GRADIENT
+#ifdef DIS_WATER
+#endif
+#ifdef PIXELATE
 #endif
 #ifdef TAA
 #endif
-#ifdef TAA_FAC
+    #ifdef TAA_MOTION_BLUR
+    #endif
+#ifdef WHITE_WORLD
 #endif
-#ifdef VHS
+#ifdef SEPARATE_ENTITIES_DRAWS
 #endif
-#ifdef VHS_TYPE
+
+#ifdef DEBUG
 #endif
-#ifdef VHS_DOWNSCALE
+    #ifdef DEBUG_MODE
+    #endif
+
+#ifdef RENDER_OPAQUE
 #endif
-#ifdef RENDER_TERRAIN
+#ifdef RENDER_TRANSLUCENT
+#endif
+#ifdef RENDER_OPAQUE_VX
+#endif
+#ifdef RENDER_TRANSLUCENT_VX
+#endif
+#ifdef RENDER_CLOUDS
 #endif
 #ifdef RENDER_BEACON_BEAMS
 #endif
-#ifdef RENDER_DISTANT_HORIZONS
-#endif
-#ifdef TRANSPARENT_WATER_CAULDRON
-#endif
+

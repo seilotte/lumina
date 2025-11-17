@@ -1,0 +1,3 @@
+*.vsh linguist-language=GLSL
+*.fsh linguist-language=GLSL
+*.lang linguist-language=INI

@@ -1,0 +1,51 @@
+{
+    "version": 1,
+
+    "excludeLodsFromVanillaDepth": false,
+
+    "uniforms": [
+        "u_shadowLightDirection",
+
+        "u_viewResolution",
+        "u_lightColor",
+
+        "isEyeInWater",
+
+        "frameTimeCounter",
+        "fogStart",
+        "fogEnd",
+        "cloudTime",
+
+        "fogColor",
+        "skyColor",
+
+        "cameraPosition",
+        "previousCameraPosition",
+
+        "gbufferModelViewInverse",
+        "gbufferPreviousModelView",
+        "gbufferProjection",
+        "gbufferPreviousProjection",
+
+        "vxRenderDistance",
+
+        "vxProjInv"
+    ],
+
+    "samplers": {
+        "noisetex": "sampler2D",
+        "cloudtex": "sampler2D",
+        "vxDepthTexOpaque": "sampler2D",
+        "colortex8": "sampler2D",
+        "colortex9": "sampler2D"
+    },
+
+    "opaqueDrawBuffers": [0, 7, 6, 1, 10, 17, 16],
+    "translucentDrawBuffers": [1, 10, 17, 16],
+
+    "blending": {
+        -1: "off",
+        0: "SRC_ALPHA ONE_MINUS_SRC_ALPHA ONE ZERO",
+        1: "SRC_ALPHA ONE_MINUS_SRC_ALPHA ONE ZERO"
+    }
+}

@@ -1,5 +1,4 @@
 #define FSH
-#define OVERWORLD
+#define G_LINE
 
-#include "/program/version.glsl"
-#include "/program/0.4_gbu_line.glsl"
+#include "/programme/gbuffers/line.glsl"

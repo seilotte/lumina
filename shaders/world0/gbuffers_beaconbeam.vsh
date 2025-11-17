@@ -1,5 +1,4 @@
 #define VSH
-#define OVERWORLD
+#define G_BEACONBEAM
 
-#include "/program/version.glsl"
-#include "/program/0.3_gbu_beaconbeam.glsl"
+#include "/programme/gbuffers/_emissive.glsl"

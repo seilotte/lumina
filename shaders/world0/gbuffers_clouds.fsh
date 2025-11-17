@@ -1,5 +1,4 @@
-#define FSH
-#define OVERWORLD
+#define FSH_COMPAT
+#define G_CLOUDS
 
-#include "/program/version.glsl"
-#include "/program/0.5_gbu_clouds.glsl"
+#include "/programme/gbuffers/clouds.glsl"

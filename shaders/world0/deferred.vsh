@@ -1,5 +1,3 @@
 #define VSH
-#define OVERWORLD
 
-#include "/program/version.glsl"
-#include "/program/1.4_def0_ssgi|ssao|sscl.glsl"
+#include "/programme/composites/d0_ao_gi_shadows.glsl"

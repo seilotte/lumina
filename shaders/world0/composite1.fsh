@@ -1,5 +1,3 @@
 #define FSH
-#define OVERWORLD
 
-#include "/program/version.glsl"
-#include "/program/2.1_com1_taa.glsl"
+#include "/programme/composites/c1_apply_transparency.glsl"
