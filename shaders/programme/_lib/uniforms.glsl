@@ -61,8 +61,6 @@ uniform mat4 projectionMatrixInverse;
 
 uniform int vxRenderDistance;
 
-#define vxFar float(vxRenderDistance)
-
 // uniform mat4 vxModelView;
 // uniform mat4 vxModelViewInv;
 // uniform mat4 vxModelViewPrev;

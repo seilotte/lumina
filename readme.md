@@ -31,7 +31,7 @@ This shader was developed using the following versions:
 - [Fabric](https://fabricmc.net/): 0.17.3
 - [Sodium](https://modrinth.com/mod/sodium): 0.7.2 Fabric
 - [Iris](https://modrinth.com/mod/iris): 1.9.6 Fabric
-- [Distant Horizons](https://modrinth.com/mod/voxy): 0.2.6 (Alpha) Fabric
+- [Voxy](https://modrinth.com/mod/voxy): 0.2.6 (Alpha) Fabric
 - [SPBR](https://modrinth.com/resourcepack/spbr): 18.8
 
 > [!NOTE]

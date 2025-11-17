@@ -1,25 +1,40 @@
-// #include "/programme/_lib/version.glsl" // 460 core voxy's default
+/*
+NOTE: We are patching the original shader, therefore:
 
-// #include "/programme/_lib/uniforms.glsl" // voxy.json
+- Version is 460 core.
+
+- The following are defined in "voxy.json":
+    - Uniforms.
+    - Samplers.
+    - Render targets.
+    - Blend functions.
+    - ...
+
+- There is a parameters struct.
+    - struct VoxyFragmentParameters {
+        uint face;
+        uint modelId;
+        uint customId;// same as iris's mcEntity.x
+        vec2 uv;
+        vec2 lightMap;
+        vec2 tile;
+        vec4 tinting;
+        vec4 sampledColour;
+    };
+- ...
+*/
+
+// #include "/programme/_lib/version.glsl"
+
+// #include "/programme/_lib/uniforms.glsl"
 #include "/programme/_lib/math.glsl"
 #include "/shader.h"
-
-// struct VoxyFragmentParameters { // we are patching
-//     uint face;
-//     uint modelId;
-//     uint customId;// same as iris's mcEntity.x
-//     vec2 uv;
-//     vec2 lightMap;
-//     vec2 tile;
-//     vec4 tinting;
-//     vec4 sampledColour;
-// };
 
 // =========
 
 
 
-/* RENDERTARGETS: 0,7,6,1,10,17,16 */ // voxy.json
+/* RENDERTARGETS: ... */
 layout(location = 0) out vec4 col0;
 layout(location = 1) out uint col7;
 layout(location = 2) out vec4 col6;

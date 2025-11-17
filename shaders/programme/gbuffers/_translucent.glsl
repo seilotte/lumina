@@ -150,6 +150,8 @@ uniform sampler2D colortex6;
 
 // =========
 
+// [cyanember] shaderLABS discord
+// Modified.
 vec2 texel_offset(vec2 uv, vec2 s)
 { // uv = uv_atlas, s = texture_size
     return inverse(mat2x2(dFdx(uv),dFdy(uv))) * (((floor(uv * s) + 0.5) / s) - uv);

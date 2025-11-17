@@ -141,26 +141,26 @@ const ivec2 space_size = char_size + ivec2(char_spacing, line_spacing);
 // Text renderer
 
 struct Text {
-	vec4 result;     // Output color from the text renderer
-	vec4 fg_col;      // Text foreground color
-	vec4 bg_col;      // Text background color
-	ivec2 frag_pos;   // The position of the fragment (can be scaled to adjust the size of the text)
-	ivec2 text_pos;   // The position of the top-left corner of the text
-	ivec2 char_pos;   // The position of the next character in the text
-	int base;        // Number base
-	int fp_precision; // Number of decimal places to print
+	vec4 result; 		// Output color from the text renderer
+	vec4 fg_col; 		// Text foreground color
+	vec4 bg_col; 		// Text background color
+	ivec2 frag_pos; 	// The position of the fragment (can be scaled to adjust the size of the text)
+	ivec2 text_pos; 	// The position of the top-left corner of the text
+	ivec2 char_pos; 	// The position of the next character in the text
+	int base; 			// Number base
+	int fp_precision; 	// Number of decimal places to print
 } text;
 
 // Fills the global text object with default values
 void begin_text(ivec2 frag_pos, ivec2 text_pos) {
-	text.result      = vec4(0.0);
-	text.fg_col       = vec4(1.0);
-	text.bg_col       = vec4(0.0, 0.0, 0.0, 0.6);
-	text.frag_pos     = frag_pos;
-	text.text_pos     = text_pos;
-	text.char_pos     = ivec2(0);
-	text.base        = 10;
-	text.fp_precision = 2;
+	text.result 		= vec4(0.0);
+	text.fg_col 		= vec4(1.0);
+	text.bg_col 		= vec4(0.0, 0.0, 0.0, 0.6);
+	text.frag_pos 		= frag_pos;
+	text.text_pos 		= text_pos;
+	text.char_pos 		= ivec2(0);
+	text.base 			= 10;
+	text.fp_precision 	= 2;
 }
 
 // Applies the rendered text to the fragment
@@ -190,8 +190,8 @@ void print_char(uint character) {
 	text.char_pos.x++;
 }
 
-#define print(string) {                                               \
-	uint[] characters = uint[] string;                                     \
+#define print(string) { \
+	uint[] characters = uint[] string; \
 	for (int i = 0; i < characters.length(); ++i) print_char(characters[i]); \
 }
 

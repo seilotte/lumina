@@ -31,7 +31,6 @@ NOTE: We are patching the original shader, therefore:
 #include "/shader.h"
 
 // uniform sampler2D ...
-#define vxFar float(vxRenderDistance)
 
 // =========
 

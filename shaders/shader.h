@@ -226,8 +226,13 @@ const vec4 colortex16ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 
 // =========
 
-#if !defined VOXY || \
-(!defined RENDER_OPAQUE_VX && !defined RENDER_TRANSLUCENT_VX) \
+// TODO: Remove this. Custom uniform?
+#if defined VOXY && \
+(defined RENDER_OPAQUE_VX || defined RENDER_TRANSLUCENT_VX)
+
+    #define vxFar float(vxRenderDistance)
+
+#else
 
     #if defined VOXY
         #undef VOXY
