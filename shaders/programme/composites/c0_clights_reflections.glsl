@@ -165,6 +165,10 @@ void main()
 
             radius *= fract(dither + float(frameCounter) * 1.618034);
 
+        #else
+
+            radius *= dither;
+
         #endif
 
         vec3 emissive = texture(colortex0, uv).rgb * is_emissive;
