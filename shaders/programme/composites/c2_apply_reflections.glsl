@@ -6,11 +6,9 @@
 
 #ifdef VSH
 
-out vec2 uv;
-
 in vec3 vaPosition;
 
-
+out vec2 uv;
 
 // =========
 
@@ -39,12 +37,15 @@ void main()
 
 in vec2 uv;
 
-uniform sampler2D colortex0; // final.rgb
-uniform sampler2D colortex10; // final.rgb (translucency)
-uniform sampler2D colortex1; // alpha.r
-uniform sampler2D colortex3; // reflections.rgb, reflections_mask.a
+uniform sampler2D colortex1; // final.rgb
+uniform sampler2D colortex9; // reflections.rgb, reflections_mask.a
 
 // =========
+
+float luma(vec3 c)
+{
+    return dot(c, vec3(0.2126, 0.7152, 0.0722));
+}
 
 vec3 purkinje_shift(vec3 rgb)
 {
@@ -73,42 +74,29 @@ vec3 purkinje_shift(vec3 rgb)
     return (lms_gain_to_rgb * lms_gain) * lmsr.w;
 }
 
-float luma(vec3 c)
-{
-    return dot(c, vec3(0.2126, 0.7152, 0.0722));
-}
-
 // =========
 
 
 
-/* RENDERTARGETS: 0 */
-layout(location = 0) out vec3 col0;
+/* RENDERTARGETS: 1 */
+layout(location = 0) out vec3 col1;
 
 void main()
 {
     // Initialize values.
-//     col0 = vec3(0.0);
+//     col1 = vec3(0.0);
 
 
 
-    ivec2 texel = ivec2(gl_FragCoord);
-
-    // TODO: Find a better solution for Voxy translucency.
-    // In other words, remove all the extra buffers and passes.
-    vec3 c0 = texelFetch(colortex0, texel, 0).rgb;
-    float c1 = texelFetch(colortex1, texel, 0).r;
-    vec3 c10 = texelFetch(colortex10, texel, 0).rgb;
-
-    c0 = c0 * c1 + c10;
+    vec3 c1 = texelFetch(colortex1, ivec2(gl_FragCoord), 0).rgb;
 
 
 
     #if defined SS_R
 
-        vec4 c3 = texelFetch(colortex3, ivec2(gl_FragCoord.xy * SS_R_RES), 0);
-
-        c0.rgb = mix(c0.rgb, c3.rgb, c3.a);
+        // TODO: Do not use textureSize().
+        vec4 c9 = texelFetch(colortex9, ivec2(uv * textureSize(colortex9, 0)), 0);
+        c1 += (c9.rgb - c1) * c9.a; // mix()
 
     #endif
 
@@ -116,14 +104,14 @@ void main()
 
     #if 1
 
-        c0 += purkinje_shift(c0) * (1.0 - skyColor.b) * (1.0 - luma(c0)) * 0.05;
+        c1 += purkinje_shift(c1) * (1.0 - skyColor.b) * (1.0 - luma(c1)) * 0.03;
 
     #endif
 
 
 
     // Write.
-    col0 = c0;
+    col1 = c1;
 }
 
 #endif

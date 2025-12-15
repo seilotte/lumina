@@ -39,20 +39,11 @@ void main()
 in vec2 uv;
 
 uniform sampler2D noisetex;
-uniform sampler2D depthtex0;
 
-// uniform sampler2D colortex0; // albedo.rgb, diffuse.a
-uniform usampler2D colortex7; // data.r
-uniform sampler2D colortex6; // depth.r, pos_vs_pixelated.gba
+uniform sampler2D colortex3; // depth.r, pos_vs_pixelated.gba (opaque)
+uniform usampler2D colortex5; // data.r (opaque)
 
-uniform sampler2D colortex5; // ao_prev.r, shadows_prev.g, pixel_age_prev.b
-// uniform sampler2D colortex4; // gi_prev.rgb
-
-#if defined VOXY
-
-    #define depthtex0 colortex6
-
-#endif
+uniform sampler2D colortex7; // ao.r, shadows.g, pixel_age.b (previous)
 
 // =========
 
@@ -68,7 +59,7 @@ uint update_sectors(vec2 horizons)
     // round: half a sector
     // ceil: touches the sector
     // floor: entire sector
-    uint angle = uint(ceil((horizons.y - horizons.x) * 32.0));
+    uint angle = uint(round((horizons.y - horizons.x) * 32.0));
     uint bitfield = angle > 0u ? (0xFFFFFFFFu >> (32u - angle)) : 0u;
 
     return bitfield << start;
@@ -79,7 +70,7 @@ float min_of(vec3 v)
     return min(min(v.x, v.y), v.z);
 }
 
-vec2 get_prev_screen(vec3 p)
+vec3 get_prev_screen(vec3 p)
 {
     // screen -> ndc
     p = p * 2.0 - 1.0;
@@ -124,46 +115,52 @@ vec2 get_prev_screen(vec3 p)
     ) / (gPrevProj[2].w * p.z);
 
     // prev_ndc -> prev_screen
-    return p.xy * 0.5 + 0.5;
+    return p * 0.5 + 0.5;
 }
 
 // =========
 
 
 
-/* RENDERTARGETS: 5 */
-layout(location = 0) out vec3 col5;
-// layout(location = 1) out vec3 col4;
+/* RENDERTARGETS: 7 */
+layout(location = 0) out vec3 col7;
 
 void main()
 {
     // Initialize values.
-    col5 = vec3(1.0, 1.0, 0.0);
-//     col4 = vec3(0.0);
+    col7 = vec3(1.0, 1.0, 0.0);
+//     col8 = vec3(0.0);
 
 
 
     // gl_FragCoord = floor(uv * resolution) + 0.5
 //     ivec2 texel = ivec2(gl_FragCoord.xy * 2.0); // resolution
-    ivec2 texel = ivec2(gl_FragCoord.xy / SS_AO_RES);
+
+//     const vec2 resolution = u_viewResolution.xy * vec2(0.5, 1.0);
+    #define resolution u_viewResolution.xy
+    const ivec2 texel = ivec2(uv * resolution);
 
 
 
-    float dither = texelFetch(noisetex, texel & 63, 0).r;
-    dither = fract(dither + float(frameCounter) * 1.618034);
+    float dither = texelFetch(noisetex, ivec2(gl_FragCoord.xy) & 63, 0).r;
 
-    uint c7 = texelFetch(colortex7, texel, 0).r; // data
+    #if defined SS_AO_ACCUM || defined TAA
+
+        dither = fract(dither + float(frameCounter) * 1.618034);
+
+    #endif
+
+    uint c5 = texelFetch(colortex5, texel, 0).r; // data
 
     vec3 normal_vs;
-    normal_vs.x = float((c7 >> 26u) & 63u) / 63.0;
-    normal_vs.y = float((c7 >> 20u) & 63u) / 63.0;
-    normal_vs.z = float((c7 >> 14u) & 63u) / 63.0;
+    normal_vs.x = float((c5 >> 26u) & 63u) / 63.0;
+    normal_vs.y = float((c5 >> 20u) & 63u) / 63.0;
+    normal_vs.z = float((c5 >> 14u) & 63u) / 63.0;
     normal_vs = mat3(gMV) * (normal_vs * 2.0 - 1.0);
 
 
 
-//     vec3 pos_ss = vec3(uv, textureLod(depthtex0, uv, 0.0).r);
-    vec3 pos_ss = vec3(uv, texelFetch(depthtex0, texel, 0).r);
+    vec3 pos_ss = vec3(uv, texelFetch(colortex3, texel, 0).r);
     if (pos_ss.z == 1.0 || pos_ss.z < 0.56) return; // is_sky & is_hand
 
     #if !defined PIXELATE
@@ -172,14 +169,13 @@ void main()
 
     #else
 
-//         vec3 pos_vs = textureLod(colortex6, uv, 0.0).gba;
-        vec3 pos_vs = texelFetch(colortex6, texel, 0).gba;
+        vec3 pos_vs = texelFetch(colortex3, texel, 0).gba;
 
     #endif
 
-//     // TODO: Fix with get_prev_screen().
+    // TODO: Fix with get_prev_screen().
 //     pos_ss = pos_ss * 2.0 - 1.0; // ndc
-//     pos_ss.z /= pos_vs.z < 0.56 ? MC_HAND_DEPTH : 1.0;
+//     pos_ss.z /= pos_ss.z < 0.56 ? MC_HAND_DEPTH : 1.0;
 //
 //     vec3 pos_vs = unproj3(gprojInv, pos_ss);
 
@@ -203,7 +199,7 @@ void main()
 
 
     float ao = 0.0; // ambient occlusion
-    vec3 gi = vec3(0.0); // global illumination or emissives
+//     vec3 gi = vec3(0.0); // global illumination or emissives
 
     for (float i = 1.0; i <= SS_AO_ITERS; ++i)
     {
@@ -214,8 +210,7 @@ void main()
         if (clamp(sam_ss, 0.0, 1.0) != sam_ss) continue;
 
         // TODO: Mip optimization (depth hierarchical z-buffer).
-//         float sam_depth = textureLod(depthtex0, sam_ss, 0.0).r;
-        float sam_depth = texelFetch(depthtex0, ivec2(sam_ss * u_viewResolution.xy + 0.5), 0).r;
+        float sam_depth = texelFetch(colortex3, ivec2(sam_ss * resolution), 0).r;
         if (sam_depth == 1.0) continue;
 
         // NOTE: When *PIXELATE* is active,
@@ -246,8 +241,8 @@ void main()
 
 
     // Write.
-    col5.r = ao;
-//     col4 = gi;
+    col7.r = ao;
+//     col8 = gi;
 
 #endif
 #endif
@@ -274,26 +269,35 @@ void main()
     float rcp_iters = 2.0 / SS_AO_ITERS;
 
     float radius = min(RADIUS_MAX, -pos_vs.z * 0.25);
-    float dither2 = noise_r2(gl_FragCoord.xy + float(frameCounter) * 1.618034);
+
+    #if !defined SS_AO_ACCUM
+
+        float dither2 = noise_r2(gl_FragCoord.xy);
+
+    #else
+
+        float dither2 = noise_r2(gl_FragCoord.xy + float(frameCounter) * 1.3); // 1.3 chosen empirically
+
+    #endif
 
 
 
     float ao = 0.0; // ambient occlusion
 //     vec3 gi = vec3(0.0); // global illumination or emissives
 
-    for (int j = 0; j < SS_AO_DIRS; ++j)
+    for (float j = 1.0; j <= SS_AO_DIRS; ++j)
     {
-        float phi = (3.14159 * rcp_dirs) * (float(j) + dither2);
+        float phi = (3.141593 * rcp_dirs) * (j + dither);
         vec2 omega = vec2(cos(phi), sin(phi));
 
         float n;
         {
             // slice
-            vec3 axis = normalize_fast(cross(vec3(omega, 0.0), view_vs));
-            vec3 normal_proj = normal_vs - axis * dot(normal_vs, axis);
+            vec3 axis = cross(vec3(omega, 0.0), view_vs);
             vec3 tangent = cross(view_vs, axis);
+            vec3 normal_proj = normal_vs - axis * dot(normal_vs, axis);
 
-            float n_sgn = -sign(dot(normal_proj, tangent));
+            float n_sgn = sign(dot(normal_proj, tangent));
             float n_cos = dot(normalize_fast(normal_proj), view_vs);
 
             n = n_sgn * acos_fast(n_cos);
@@ -301,9 +305,9 @@ void main()
 
         uint occ_bits = 0u;
 
-        for (int i = 1; i < SS_AO_ITERS / 2 + 1; ++i)
+        for (float i = 0.1; i <= SS_AO_ITERS / 2; ++i)
         {
-            float s = float(i) * rcp_iters * dither;
+            float s = rcp_iters * (i + dither2);
             vec2 rd = omega * (s * radius);
 
             vec2 sam_ss0 = proj3(gProj, pos_vs - vec3(rd, 0.0)).xy * 0.5 + 0.5;
@@ -314,10 +318,12 @@ void main()
             ) continue;
 
             // TODO: Mip optimization (depth hierarchical z-buffer).
-//             float sam_depth0 = textureLod(depthtex0, sam_ss0, 0.0).r;
-//             float sam_depth1 = textureLod(depthtex0, sam_ss1, 0.0).r;
-            float sam_depth0 = texelFetch(depthtex0, ivec2(sam_ss0 * u_viewResolution.xy + 0.5), 0).r;
-            float sam_depth1 = texelFetch(depthtex0, ivec2(sam_ss1 * u_viewResolution.xy + 0.5), 0).r;
+//             float sam_depth0 = texelFetch(colortex3, ivec2(sam_ss0 * resolution), 0).r;
+//             float sam_depth1 = texelFetch(colortex3, ivec2(sam_ss1 * resolution), 0).r;
+
+            // NOTE: Iris uses hardware bilinear interpolation for colortexN by default.
+            float sam_depth0 = textureLod(colortex3, sam_ss0, 0.0).r;
+            float sam_depth1 = textureLod(colortex3, sam_ss1, 0.0).r;
             if (sam_depth0 == 1.0 && sam_depth1 == 1.0) continue;
 
             vec3 sam_vs0 = unproj3(gProjInv, vec3(sam_ss0, sam_depth0) * 2.0 - OFFSET_Z);
@@ -338,8 +344,8 @@ void main()
             horizons1.x = acos_fast(horizons1.x);
             horizons1.y = acos_fast(horizons1.y);
 
-            horizons0 = clamp(( horizons0 - n) * 0.318310 + 0.5, 0.0, 1.0); // [-pi/2, pi/2] -> [0, 1]
-            horizons1 = clamp((-horizons1 - n) * 0.318310 + 0.5, 0.0, 1.0);
+            horizons0 = clamp((n + horizons0) * 0.318310 + 0.5, 0.0, 1.0); // [0, pi] -> [0, 1]
+            horizons1 = clamp((n - horizons1) * 0.318310 + 0.5, 0.0, 1.0);
 
             uint occ_bits0 = update_sectors(horizons0.xy);
             uint occ_bits1 = update_sectors(horizons1.yx);
@@ -376,8 +382,8 @@ void main()
 
 
     // Write.
-    col5.r = ao;
-//     col4 = gi;
+    col7.r = ao;
+//     col8 = gi;
 
 #endif
 #endif
@@ -392,7 +398,7 @@ void main()
     // [h3r2tic] https://gist.github.com/h3r2tic/9c8356bdaefbe80b1a22ae0aaee192db
     // Screen Space Shadows.
     // Modified.
-    #define MAGIC_VALUE 0.996 // TODO: Test with a large render distances.
+    #define MAGIC_VALUE 0.996 // TODO: Test with a large render distance.
     #define THICKNESS 0.04
 
     vec3 ro;
@@ -417,9 +423,9 @@ void main()
 
 
     float z0, z1, z_min, z_max;
-    vec2 bi_uv;
-    vec4 bi_weights;
-    vec4 depths;
+//     vec2 bi_uv;
+//     vec4 bi_weights;
+//     vec4 depths;
 
     float shadows = 1.0;
 
@@ -429,22 +435,25 @@ void main()
         ro += rd * vec3(i);
         if (clamp(ro.xy, 0.0, 1.0) != ro.xy) continue;
 
-        { // bilinear depth
-            bi_uv = fract(ro.xy * u_viewResolution.xy - vec2(0.5));
-            bi_weights = vec4( // 00 10 01 11
-                (1.0 - bi_uv.x) * (1.0 - bi_uv.y),
-                (1.0 - bi_uv.y) * bi_uv.x,
-                (1.0 - bi_uv.x) * bi_uv.y,
-                bi_uv.x * bi_uv.y
-            );
+//         { // bilinear depth
+//             bi_uv = fract(ro.xy * resolution - vec2(0.5));
+//             bi_weights = vec4( // 00 10 01 11
+//                 (1.0 - bi_uv.x) * (1.0 - bi_uv.y),
+//                 (1.0 - bi_uv.y) * bi_uv.x,
+//                 (1.0 - bi_uv.x) * bi_uv.y,
+//                 bi_uv.x * bi_uv.y
+//             );
+//
+//             depths = textureGather(colortex3, ro.xy, 0); // 01 11 10 00
+//         }
+//
+//         // TODO: Mip optimization (depth hierarchical z-buffer).
+//         z0 = texelFetch(colortex3, ivec2(ro.xy * resolution), 0).r;
+//         z1 = dot(depths.wzxy, bi_weights);
 
-            depths = textureGather(depthtex0, ro.xy, 0); // 01 11 10 00
-        }
-
-        // TODO: Mip optimization (depth hierarchical z-buffer).
-//         z0 = textureLod(depthtex0, ro.xy, 0.0).r;
-        z0 = texelFetch(depthtex0, ivec2(ro.xy * u_viewResolution.xy + 0.5), 0).r;
-        z1 = dot(depths.wzxy, bi_weights);
+        // NOTE: Iris uses hardware bilinear interpolation for colortexN by default.
+        z0 = texelFetch(colortex3, ivec2(ro.xy * resolution), 0).r;
+        z1 = textureLod(colortex3, ro.xy, 0.0).r;
         if (z0 == 1.0 && z1 == 1.0) continue;
 
         z_min = min(z0, z1);
@@ -464,7 +473,7 @@ void main()
 
 
     // Write.
-    col5.g = shadows;
+    col7.g = shadows;
 
 #endif
 //*/
@@ -475,24 +484,20 @@ void main()
 #if defined SS_AO_ACCUM || defined SS_GI_ACCUM || defined SS_SHADOWS_ACCUM
 
     // [sixthsurge] https://github.com/sixthsurge/photon
-    // Not Temporal Anti-Aliasing.
+    // Temporal Accumulation.
     // Modified.
     #define PIXEL_AGE 10.0
 
-    vec2 uv_prev = get_prev_screen(pos_ss);
-    if (clamp(uv_prev, 0., 1.) != uv_prev) return;
+    vec3 uv_prev = get_prev_screen(pos_ss);
+    if (clamp(uv_prev.xy, 0., 1.) != uv_prev.xy) return;
 
-    vec3 c5 = textureLod(colortex5, uv_prev, 0.0).rgb; // ao_prev.r, shadows_prev.g, pixel_age_prev.b
+    vec3 c7 = textureLod(colortex7, uv_prev.xy, 0.0).rgb; // ao_prev.r, shadows_prev.g, pixel_age_prev.b
 
 
-
-    float depth = pos_ss.z;
-//     float depth_prev = textureLod(depthtex0, uv_prev, 0.0).r;
-    float depth_prev = texelFetch(depthtex0, ivec2(uv_prev * u_viewResolution.xy + 0.5), 0).r;
 
     // TODO: Use view-space depths?
-    depth = near / (1.0 - depth); // fast linearize
-    depth_prev = near / (1.0 - depth_prev);
+    float depth = near / (1.0 - pos_ss.z); // fast linearize
+    float depth_prev = near / (1.0 - uv_prev.z);
 
     // depth rejection
     float weight_depth = abs(depth - depth_prev) / max(depth, depth_prev);
@@ -501,7 +506,7 @@ void main()
 
 
 
-    float pixel_age = min(c5.b * 250.0, PIXEL_AGE) * weight_depth; // 250 within buffer 8-bits
+    float pixel_age = min(c7.b * 250.0, PIXEL_AGE) * weight_depth; // 250 within buffer 8-bits
     float pixel_fac = pixel_age / (pixel_age + 1.0);
 
 
@@ -509,18 +514,18 @@ void main()
     // Write.
     #if defined SS_AO_ACCUM || defined SS_SHADOWS_ACCUM || 1
 
-        col5.rg += (c5.rg - col5.rg) * pixel_fac; // col5 = mix(col5, col5_prev, pixel_fac)
+        col7.rg += (c7.rg - col7.rg) * pixel_fac; // col7 = mix(col7, col7_prev, pixel_fac)
 
     #endif
 
     #if defined SS_GI_ACCUM && 0
 
-        vec3 c4 = textureLod(colortex4, uv_prev, 0.0).rgb; // gi_prev.rgb
-        col4 += (c4 - col4) * pixel_fac;
+        vec3 c8 = textureLod(colortex8, uv_prev.xy, 0.0).rgb; // gi_prev.rgb
+        col8 += (c8 - col8) * pixel_fac;
 
     #endif
 
-    col5.b = (pixel_age + 1.0) * 0.004; // 1/250 within buffer 8-bits
+    col7.b = (pixel_age + 1.0) * 0.004; // 1/250 within buffer 8-bits
 
 #endif
 //*/

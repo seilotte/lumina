@@ -17,7 +17,7 @@ in vec4 at_tangent;
 flat out int id;
 out vec2 uv_atlas;
 out vec2 uv_lightmap;
-out vec3 pos_ft;
+out vec3 pos_sc;
 out vec4 vcol;
 out mat3 tbn_vs;
 
@@ -49,7 +49,7 @@ void main()
     id = int(mc_Entity.x);
     uv_atlas = vaUV0;
     uv_lightmap = vec2(vaUV2 * vaUV2) * 0.000017; // square it here
-    pos_ft = vec3(0.0);
+    pos_sc = vec3(0.0);
     vcol = vaColor;
     tbn_vs[2] = normalize(normalMatrix * vaNormal);
 
@@ -58,11 +58,11 @@ void main()
     #if defined MAP_SHADOW || defined PIXELATE || defined MAP_NORMAL_WATER
     #if defined G_HAND_WATER
 
-        pos_ft = mul3(gMVInv, mul3(mMV, position));
+        pos_sc = mul3(gMVInv, mul3(mMV, position));
 
     #else
 
-        pos_ft = position;
+        pos_sc = position;
 
     #endif
     #endif
@@ -98,7 +98,7 @@ void main()
             float mask = linearstep(
                 vxFar,
                 vxFar * 0.8,
-                sqrt_fast(dot(pos_ft, pos_ft))
+                sqrt_fast(dot(pos_sc, pos_sc))
             );
 
             position.y +=
@@ -110,6 +110,7 @@ void main()
 
 
     gl_Position = proj4(mProj, mul3(mMV, position));
+//     gl_Position.x = gl_Position.x * 0.5 - gl_Position.w * 0.5; // downscale
 }
 
 #endif
@@ -127,7 +128,7 @@ void main()
 flat in int id;
 in vec2 uv_atlas;
 in vec2 uv_lightmap;
-in vec3 pos_ft;
+in vec3 pos_sc;
 in vec4 vcol;
 in mat3 tbn_vs;
 
@@ -140,9 +141,10 @@ uniform sampler2D cloudtex; // clouds.png
 uniform sampler2D shadowtex1;
 uniform sampler2D depthtex1;
 
-uniform sampler2D colortex9; // sky.rgb
-uniform sampler2D colortex8; // coloured_lights.rgb
-uniform sampler2D colortex6;
+uniform sampler2D colortex10; // coloured_lights.rgb (previous)
+
+// NOTE: colortex0 is bound, use the image.
+layout(binding = 0, rgba8) readonly uniform image2D colorimg0; // sky.rgb
 
 // =========
 
@@ -194,31 +196,31 @@ vec2 get_prev_screen(vec3 p)
 
 
 
-/* RENDERTARGETS: 1,10,17,16 */
-layout(location = 0) out vec4 col1;
-layout(location = 1) out vec4 col10;
-layout(location = 2) out uint col17;
-layout(location = 3) out vec4 col16;
+/* RENDERTARGETS: 2,4,6 */
+layout(location = 0) out vec4 col2;
+layout(location = 1) out vec4 col4;
+layout(location = 2) out uint col6;
 
 void main()
 {
-    #if !defined PIXELATE && defined VOXY
+    #if !defined PIXELATE
 
-        col16.r = gl_FragCoord.z;
+        // Write.
+        col4.r = gl_FragCoord.z;
 
-    #elif defined PIXELATE
+    #else
 
         vec2 texel_offset = texel_offset(uv_atlas, textureSize(gtexture, 0));
 
         vec2 uv_lightmap = texel_snap(uv_lightmap, texel_offset);
-        vec3 pos_ft = texel_snap(pos_ft, texel_offset);
+        vec3 pos_sc = texel_snap(pos_sc, texel_offset);
         vec4 vcol = texel_snap(vcol, texel_offset);
 
 
 
         // Write.
-        col16.r = gl_FragCoord.z;
-        col16.gba = mul3(gMV, pos_ft);
+        col4.r = gl_FragCoord.z;
+        col4.gba = mul3(gMV, pos_sc);
 
     #endif
 
@@ -291,7 +293,7 @@ void main()
 
         if (id == i_WATER)
         {
-            vec3 pos_ws = pos_ft + cameraPosition;
+            vec3 pos_ws = pos_sc + cameraPosition;
 
             vec2 uv0 = pos_ws.xz * 0.0625; // 16px = 0.25
             vec2 uv1 = pos_ws.xz * 0.0625;
@@ -341,16 +343,26 @@ void main()
 
 
 
+    #if defined G_ENTITIES_TRANSLUCENT
+
+        // TODO: Verify there are not false positives.
+        bool is_nametag = dot(albedo + vcol, vec4(1.0)) > 7.999;
+        is_emissive = is_nametag ? 1.0 : is_emissive;
+
+    #endif
+
+
+
     float dither = noise_r2(gl_FragCoord.xy) * 0.99; // 0.99, fix fireflies when packing
 
-    vec3 normal_ft = (mat3(gMVInv) * normal_vs) * 0.5 + 0.5;
+    vec3 normal_sc = (mat3(gMVInv) * normal_vs) * 0.5 + 0.5;
 
 
 
     uint data =
-    uint(normal_ft.x * 63.0 + 0.5) << 26u | // 6
-    uint(normal_ft.y * 63.0 + 0.5) << 20u | // 6
-    uint(normal_ft.z * 63.0 + 0.5) << 14u INELEGANT // 6
+    uint(normal_sc.x * 63.0 + 0.501) << 26u | // 6
+    uint(normal_sc.y * 63.0 + 0.501) << 20u | // 6
+    uint(normal_sc.z * 63.0 + 0.501) << 14u INELEGANT // 6
 
     #if defined MAP_SPECULAR
 
@@ -365,39 +377,28 @@ void main()
 
     #endif
 
-//     #if defined G_ENTITIES_TRANSLUCENT && \
-//     !defined SEPARATE_ENTITIES_DRAWS
-//
-//         data |= uint(uv_lightmap.x * 31.0 + dither) << 9u | // 5
-//                 uint(uv_lightmap.y * 31.0 + dither) << 4u ; // 5
-//
-//     #endif
-
 
 
     // radiance
     float light = dot(normal_vs, u_shadowLightDirection) * 0.6 + 0.4;
-
-//     #if !defined G_ENTITIES_TRANSLUCENT || \
-//     defined SEPARATE_ENTITIES_DRAWS
-    #if 1
-
-        light *= uv_lightmap.y; // NOTE: Should be applied to the ambient term.
-
-    #endif
+    light *= uv_lightmap.y; // NOTE: Should be applied to the ambient term.
 
 
 
     #if defined MAP_SHADOW
 
-        float pos_dist = dot(pos_ft, pos_ft);
+        float pos_dist = dot(pos_sc, pos_sc);
         float max_dist = shadowDistance * shadowDistance;
 
-        vec3 shadow_uv = proj3_ortho(sProj, mul3(sMV, pos_ft)) * 0.5 + 0.5;
+        vec3 shadow_uv = proj3_ortho(sProj, mul3(sMV, pos_sc)); // ndc
+
+        shadow_uv.xy = mat2(u_mat2ShadowAlign) * shadow_uv.xy;
+        shadow_uv.xy /= abs(shadow_uv.xy) * 0.7 + 0.3; // distortion
+
+        shadow_uv = shadow_uv * 0.5 + 0.5;
 
         if (
-            shadow_uv.x > 0.0 && shadow_uv.x < 1.0 &&
-            shadow_uv.y > 0.0 && shadow_uv.y < 1.0 &&
+            clamp(shadow_uv.xy, 0.0, 1.0) == shadow_uv.xy &&
             shadow_uv.z < 1.0 && pos_dist < max_dist
         )
         {
@@ -414,21 +415,17 @@ void main()
 
 
 
-//     #if !defined G_ENTITIES_TRANSLUCENT || \
-//     defined SEPARATE_ENTITIES_DRAWS
-    #if 1
-
     #if defined CLOUDS_SHADOWS
 
         // [null511] https://github.com/Null-MC
         // [fayer3]
         // Cloud Shadows.
         // Modified.
-        vec2 uv_clouds = pos_ft.xz;
+        vec2 uv_clouds = pos_sc.xz;
 //         vec2 uv_clouds = mul3(gMV, pos_vs + u_shadowLightDirection * cloudHeight).xz;
 
         // 3072.0 is one full cloud cycle
-        uv_clouds = mod(pos_ft.xz, vec2(3072.0)) + cameraPosition.xz;
+        uv_clouds = mod(pos_sc.xz, vec2(3072.0)) + cameraPosition.xz;
 //         uv = mod(uv, vec2(3072.0)) + vec2(cameraPositionInt.xz) + cameraPositionFract.xz; // better
 
         uv_clouds += vec2(mod(cloudTime, 3072.0), 4.0); // 4.0 = magic_value_offset
@@ -442,15 +439,15 @@ void main()
 
 
     // shading
-    vec3 c8 = vec3(1.0, 0.8, 0.6);
+    vec3 c10 = vec3(1.0, 0.8, 0.6); // lights
 
     #if defined LIGHTS_COLOURED
 
         // NOTE: We cannot debug this here. Use the "final" programme.
-        vec2 uv_prev = get_prev_screen(pos_ft);
+        vec2 uv_prev = get_prev_screen(pos_sc);
 
-        c8 = texture(colortex8, uv_prev).rgb + vec3(1e-5, 8e-6, 6e-6);
-        c8 = c8 * inversesqrt(dot(c8, c8)); // normalize()
+        c10 = texture(colortex10, uv_prev).rgb + vec3(1e-5, 8e-6, 6e-6);
+        c10 = c10 * inversesqrt(dot(c10, c10)); // normalize()
 
     #endif
 
@@ -461,7 +458,7 @@ void main()
 
     #if defined LIGHTS_HAND
 
-        vec3 pos_hand = (pos_ft + cameraPosition) - eyePosition;
+        vec3 pos_hand = (pos_sc + cameraPosition) - eyePosition;
         float light_len = sqrt_fast(dot(pos_hand, pos_hand));
 
         light_hand.r = 4.0 + 0.234 * heldBlockLightValue; // mix(4, 8, v / 15)
@@ -502,8 +499,8 @@ void main()
     shading += u_lightColor.rgb * (light * DIFFUSE_STRENGTH);
 
     // lights
-    shading += (c8.rgb * uv_lightmap.x + light_hand + light_hand2)
-    * (LIGHTS_STRENGTH - uv_lightmap.y * skyColor.b);
+    shading += (c10.rgb * uv_lightmap.x + light_hand + light_hand2)
+    * (LIGHTS_STRENGTH - light * skyColor.b);
 
     // finalize
     #if !defined WHITE_WORLD
@@ -545,7 +542,8 @@ void main()
     #if defined FOG_BORDER || defined FOG_HEIGHT
 
         float fog = 0.0;
-        float pos_len = sqrt_fast(dot(pos_ft, pos_ft)); // length()
+        float pos_len = sqrt_fast(dot(pos_sc, pos_sc)); // length()
+        vec3 c0 = imageLoad(colorimg0, ivec2(gl_FragCoord) / 2).rgb; // sky
 
 
 
@@ -564,7 +562,7 @@ void main()
 
         #if defined FOG_HEIGHT
 
-            vec3 pos_ws = pos_ft + cameraPosition;
+            vec3 pos_ws = pos_sc + cameraPosition;
 
             float height = abs(pos_ws.y - 63.0); // sea level = 63
             height = linearstep(16.0, -16.0, height); // 1 chunk = 16
@@ -589,20 +587,16 @@ void main()
 
 
         // Write.
-        albedo.rgb = mix(albedo.rgb, texelFetch(colortex9, ivec2(gl_FragCoord), 0).rgb, fog); // sky
-
-    #endif
+        albedo.rgb = mix(albedo.rgb, c0, fog); // sky
 
     #endif
 
 
 
     // Write.
-//     col10 = vec4(0, 0, 1, 1); // debug
-
-    col1 = vec4(0, 0, 0, albedo.a);
-    col10 = albedo;
-    col17 = data;
+//     col2 = vec4(0, 0, 1, 1); // debug
+    col2 = albedo;
+    col6 = data;
 }
 
 #endif

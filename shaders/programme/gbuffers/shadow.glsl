@@ -15,6 +15,12 @@ in vec3 vaPosition;
 void main()
 {
     gl_Position = proj4_ortho(mProj, mul3(mMV, vaPosition + chunkOffset));
+
+
+
+    // Distortion.
+    gl_Position.xy = mat2(u_mat2ShadowAlign) * gl_Position.xy;
+    gl_Position.xy /= abs(gl_Position.xy) * 0.7 + 0.3; // distortion
 }
 
 #endif

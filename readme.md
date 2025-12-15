@@ -7,11 +7,16 @@
 </p>
 
 <div align = "center">
-    <img src="images/a.webp">
+<div style = "display:inline-block">
+    <img src = "images/a.webp">
+    <img src = "images/b.webp">
+    <div style = "text-align:left">
+        <em>
+            Map:
+            <a href="https://www.planetminecraft.com/project/matsuhama/">Matsuhama 松浜</a>
+        </em>
+    </div>
 </div>
-
-<div align = "center">
-    <img src="images/b.webp">
 </div>
 
 ## Installation

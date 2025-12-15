@@ -17,7 +17,7 @@ in vec4 at_midBlock;
 
 out vec2 uv_atlas;
 out vec2 uv_lightmap;
-out vec3 pos_ft;
+out vec3 pos_sc;
 out vec4 vcol;
 out mat3 tbn_vs;
 
@@ -48,7 +48,7 @@ void main()
 
     uv_atlas = vaUV0;
     uv_lightmap = vec2(vaUV2 * vaUV2) * 0.000017; // square it here
-    pos_ft = vec3(0.0);
+    pos_sc = vec3(0.0);
     vcol = vaColor;
     tbn_vs[2] = normalize(normalMatrix * vaNormal);
 
@@ -57,11 +57,11 @@ void main()
     #if defined MAP_SHADOW || defined PIXELATE
     #if defined G_HAND
 
-        pos_ft = mul3(gMVInv, mul3(mMV, position));
+        pos_sc = mul3(gMVInv, mul3(mMV, position));
 
     #else
 
-        pos_ft = position;
+        pos_sc = position;
 
     #endif
     #endif
@@ -144,6 +144,7 @@ void main()
 
 
     gl_Position = proj4(mProj, mul3(mMV, position));
+//     gl_Position.x = gl_Position.x * 0.5 - gl_Position.w * 0.5; // downscale
 }
 
 #endif
@@ -160,7 +161,7 @@ void main()
 
 in vec2 uv_atlas;
 in vec2 uv_lightmap;
-in vec3 pos_ft;
+in vec3 pos_sc;
 in vec4 vcol;
 in mat3 tbn_vs;
 
@@ -187,37 +188,36 @@ vec4 texel_snap(vec4 a, vec2 t) { return a + (dFdx(a) * t.x + dFdy(a) * t.y); }
 
 // =========
 
-/* RENDERTARGETS: 0,7,6,1,10,17,16 */
-layout(location = 0) out vec4 col0;
-layout(location = 1) out uint col7;
-layout(location = 2) out vec4 col6;
-
-layout(location = 3) out vec4 col1;
-layout(location = 4) out vec4 col10;
-layout(location = 5) out uint col17;
-layout(location = 6) out vec4 col16;
+/* RENDERTARGETS: 1,2,3,4,5,6 */
+layout(location = 0) out vec4 col1;
+layout(location = 1) out vec4 col2;
+layout(location = 2) out vec4 col3;
+layout(location = 3) out vec4 col4;
+layout(location = 4) out uint col5;
+layout(location = 5) out uint col6;
 
 void main()
 {
-    #if !defined PIXELATE && defined VOXY
+    #if !defined PIXELATE
 
-        col6.r = gl_FragCoord.z;
+        // Write.
+        col3.r = gl_FragCoord.z;
+        col4.r = gl_FragCoord.z;
 
-    #elif defined PIXELATE
+    #else
 
         vec2 texel_offset = texel_offset(uv_atlas, textureSize(gtexture, 0));
 
         vec2 uv_lightmap = texel_snap(uv_lightmap, texel_offset);
-        vec3 pos_ft = texel_snap(pos_ft, texel_offset);
+        vec3 pos_sc = texel_snap(pos_sc, texel_offset);
         vec4 vcol = texel_snap(vcol, texel_offset);
 
 
 
         // Write.
-        col6.r = gl_FragCoord.z;
-        col6.gba = mul3(gMV, pos_ft);
-
-        col16 = col6;
+        col3.r = gl_FragCoord.z;
+        col3.gba = mul3(gMV, pos_sc);
+        col4 = col3;
 
     #endif
 
@@ -291,14 +291,14 @@ void main()
 
     float dither = noise_r2(gl_FragCoord.xy) * 0.99; // 0.99, fix fireflies when packing
 
-    vec3 normal_ft = (mat3(gMVInv) * normal_vs) * 0.5 + 0.5;
+    vec3 normal_sc = (mat3(gMVInv) * normal_vs) * 0.5 + 0.5;
 
 
 
     uint data =
-    uint(normal_ft.x * 63.0 + 0.5) << 26u | // 6
-    uint(normal_ft.y * 63.0 + 0.5) << 20u | // 6
-    uint(normal_ft.z * 63.0 + 0.5) << 14u | // 6
+    uint(normal_sc.x * 63.0 + 0.501) << 26u | // 6
+    uint(normal_sc.y * 63.0 + 0.501) << 20u | // 6
+    uint(normal_sc.z * 63.0 + 0.501) << 14u | // 6
 
     uint(uv_lightmap.x * 31.0 + dither) << 9u | // 5
     uint(uv_lightmap.y * 31.0 + dither) << 4u INELEGANT // 5
@@ -320,14 +320,18 @@ void main()
 
     #if defined MAP_SHADOW
 
-        float pos_dist = dot(pos_ft, pos_ft);
+        float pos_dist = dot(pos_sc, pos_sc);
         float max_dist = shadowDistance * shadowDistance;
 
-        vec3 shadow_uv = proj3_ortho(sProj, mul3(sMV, pos_ft)) * 0.5 + 0.5;
+        vec3 shadow_uv = proj3_ortho(sProj, mul3(sMV, pos_sc)); // ndc
+
+        shadow_uv.xy = mat2(u_mat2ShadowAlign) * shadow_uv.xy;
+        shadow_uv.xy /= abs(shadow_uv.xy) * 0.7 + 0.3; // distortion
+
+        shadow_uv = shadow_uv * 0.5 + 0.5;
 
         if (
-            shadow_uv.x > 0.0 && shadow_uv.x < 1.0 &&
-            shadow_uv.y > 0.0 && shadow_uv.y < 1.0 &&
+            clamp(shadow_uv.xy, 0.0, 1.0) == shadow_uv.xy &&
             shadow_uv.z < 1.0 && pos_dist < max_dist
 //             && light > 0.401
         )
@@ -346,13 +350,11 @@ void main()
 
 
     // Write.
-//     col0 = vec4(1, 0, 0, 1); // debug
-    col0 = vec4(albedo.rgb, light);
-    col7 = data;
-
-    col1 = vec4(1.0);
-    col10 = vec4(0.0);
-    col17 = data;
+//     col1 = vec4(1, 0, 0, 1); // debug
+    col1 = vec4(albedo.rgb, light);
+    col2 = vec4(0., 0., 0., 1.); // curse entitites
+    col5 = data;
+    col6 = data;
 }
 
 #endif

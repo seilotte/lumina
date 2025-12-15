@@ -30,19 +30,19 @@ NOTE: We are patching the original shader, therefore:
 #include "/programme/_lib/math.glsl"
 #include "/shader.h"
 
+// uniform sampler2D ...
+
 // =========
 
 
 
 /* RENDERTARGETS: ... */
-layout(location = 0) out vec4 col0;
-layout(location = 1) out uint col7;
-layout(location = 2) out vec4 col6;
-
-layout(location = 3) out vec4 col1;
-layout(location = 4) out vec4 col10;
-layout(location = 5) out uint col17;
-layout(location = 6) out vec4 col16;
+layout(location = 0) out vec4 col1;
+layout(location = 1) out vec4 col2;
+layout(location = 2) out vec4 col3;
+layout(location = 3) out vec4 col4;
+layout(location = 4) out uint col5;
+layout(location = 5) out uint col6;
 
 void voxy_emitFragment(VoxyFragmentParameters parameters)
 {
@@ -54,7 +54,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
 
 
 
-    #if defined PIXELATE || defined VOXY
+    #if defined PIXELATE || 1
 
         // NOTE: Derivatives are currently unsupported.
         // Therefore, PIXELATE has no effect.
@@ -66,12 +66,21 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
 
 
 
+    #if !defined PIXELATE
+
         // Write.
-        col6.r = pos_ss.z;
-        col6.gba = pos_vs;
+        col3.r = pos_ss.z;
+        col3.gba = vec3(0.0);
+        col4 = col3;
 
-        col16 = col6;
+    #else
 
+        // Write.
+        col3.r = pos_ss.z;
+        col3.gba = pos_vs;
+        col4 = col3;
+
+    #endif
     #endif
 
 
@@ -114,7 +123,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
 
     float dither = noise_r2(gl_FragCoord.xy) * 0.99; // 0.99, fix fireflies when packing
 
-    vec3 normal_ft = vec3(
+    vec3 normal_sc = vec3(
         parameters.face >> 1u == 2u,
         parameters.face >> 1u == 0u,
         parameters.face >> 1u == 1u
@@ -125,7 +134,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
         parameters.customId > 99 && parameters.customId < 110
     )
     {
-        normal_ft = vec3(0.0, 1.0, 0.0);
+        normal_sc = vec3(0.0, 1.0, 0.0);
     }
 
     vec2 uv_lightmap = parameters.lightMap * parameters.lightMap; // square it here
@@ -133,9 +142,9 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
 
 
     uint data =
-    uint(fma(normal_ft.x, 0.5, 0.5) * 63.0 + 0.5) << 26u | // 6
-    uint(fma(normal_ft.y, 0.5, 0.5) * 63.0 + 0.5) << 20u | // 6
-    uint(fma(normal_ft.z, 0.5, 0.5) * 63.0 + 0.5) << 14u | // 6
+    uint(fma(normal_sc.x, 0.5, 0.5) * 63.0 + 0.501) << 26u | // 6
+    uint(fma(normal_sc.y, 0.5, 0.5) * 63.0 + 0.501) << 20u | // 6
+    uint(fma(normal_sc.z, 0.5, 0.5) * 63.0 + 0.501) << 14u | // 6
 
     uint(uv_lightmap.x * 31.0 + dither) << 9u | // 5
     uint(uv_lightmap.y * 31.0 + dither) << 4u INELEGANT // 5
@@ -150,16 +159,14 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
 
 
     // radiance
-    float light = fma(dot(normal_ft, mat3(gMVInv) * u_shadowLightDirection), 0.6, 0.4);
+    float light = fma(dot(normal_sc, mat3(gMVInv) * u_shadowLightDirection), 0.6, 0.4);
 
 
 
     // Write.
-//     col0 = vec4(1, 0, 0, 1); // debug
-    col0 = vec4(albedo.rgb, light);
-    col7 = data;
-
-    col1 = vec4(1.0);
-    col10 = vec4(0.0);
-    col17 = data;
+//     col1 = vec4(1, 0, 0, 1); // debug
+    col1 = vec4(albedo.rgb, light);
+    col2 = vec4(0., 0., 0., 1.); // curse entitites
+    col5 = data;
+    col6 = data;
 }

@@ -6,10 +6,10 @@
 
 #ifdef VSH
 
-in vec2 vaUV0;
 in vec3 vaPosition;
+in vec4 vaColor;
 
-out vec2 uv;
+flat out vec4 vcol;
 
 // =========
 
@@ -17,7 +17,7 @@ out vec2 uv;
 
 void main()
 {
-    uv = vaUV0;
+    vcol = vaColor; // f3 + g, lead
 
 
 
@@ -37,9 +37,7 @@ void main()
 
 #ifdef FSH
 
-in vec2 uv;
-
-uniform sampler2D gtexture; // not atlas
+flat in vec4 vcol;
 
 // =========
 
@@ -50,8 +48,12 @@ layout(location = 0) out vec4 col1;
 
 void main()
 {
+    if (vcol.a < 0.1) {discard; return;}
+
+
+
     // Write.
-    col1 = texture(gtexture, uv);
+    col1 = vcol;
 }
 
 #endif

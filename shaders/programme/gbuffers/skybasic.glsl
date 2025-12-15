@@ -35,7 +35,8 @@ void main()
 
     if (renderStage == MC_RENDER_STAGE_STARS)
     {
-        gl_Position = proj4(mProj, mul3(mMV, vaPosition));
+//         gl_Position = proj4(mProj, mul3(mMV, vaPosition));
+        gl_Position = mProj * mMV * vec4(vaPosition, 1.0);
     }
     else if (renderStage == MC_RENDER_STAGE_SKY && gl_VertexID < 4)
     {
@@ -47,6 +48,12 @@ void main()
         gl_Position = vec4(-10.0); // discard
         return;
     }
+
+
+
+    // NOTE: Stars, do not "downscale" accurately,
+    // half resolution is sufficient.
+    gl_Position.xy = gl_Position.xy * 0.5 - gl_Position.w * 0.5; // x*res + x*(res-1)
 }
 
 #endif
@@ -64,6 +71,8 @@ void main()
 in vec2 uv_ndc;
 in vec3 vcol;
 
+uniform sampler2D noisetex;
+
 // =========
 
 vec3 normalize_fast(vec3 v)
@@ -76,9 +85,8 @@ vec3 normalize_fast(vec3 v)
 
 
 
-/* RENDERTARGETS: 0,9 */
+/* RENDERTARGETS: 0 */
 layout(location = 0) out vec4 col0;
-layout(location = 1) out vec4 col9;
 
 void main()
 {
@@ -118,14 +126,14 @@ void main()
         albedo = mix(albedo, u_lightColor.rgb, light_mask);
 
         // dither; x * 1.0/bit_range - 0.5/bit_range
-        albedo += noise_r2(gl_FragCoord.xy) * 0.004 - 0.002;
+//         albedo += noise_r2(gl_FragCoord.xy) * 0.004 - 0.002;
+        albedo += texelFetch(noisetex, ivec2(gl_FragCoord) & 63, 0).r * 0.004 - 0.002;
     }
 
 
 
     // Write.
-    col0 = vec4(albedo, 1.0);
-    col9 = vec4(albedo, float(renderStage != MC_RENDER_STAGE_STARS));
+    col0 = vec4(albedo, float(renderStage != MC_RENDER_STAGE_STARS));
 }
 
 #endif

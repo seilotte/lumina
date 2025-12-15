@@ -27,7 +27,7 @@ vec2 normalize_fast(vec2 v)
 
 void main()
 {
-    vcol = vaColor; // f3 + b, f3 + g
+    vcol = vaColor; // f3 + b
 
 
 
@@ -45,10 +45,12 @@ void main()
     vec2 line_screen_dir = normalize_fast((ndc2.xy - ndc1.xy) * u_viewResolution.xy);
     vec2 line_offset = vec2(-line_screen_dir.y, line_screen_dir.x) * LINE_WIDTH * u_viewResolution.zw;
 
-    if (line_offset.x < 0.0) line_offset = -line_offset;
-    if ((gl_VertexID & 1) != 0) line_offset = -line_offset;
+//     if (line_offset.x < 0.0) line_offset = -line_offset;
+//     if ((gl_VertexID & 1) != 0) line_offset = -line_offset;
+    line_offset = line_offset.x < 0.0 ^^ (gl_VertexID & 1) == 0 ? -line_offset : line_offset;
 
     gl_Position = vec4((ndc1 + vec3(line_offset, 0.0)) * line_start.w, line_start.w);
+//     gl_Position.x = gl_Position.x * 0.5 - gl_Position.w * 0.5; // downscale
 }
 
 #endif
@@ -69,13 +71,13 @@ in vec4 vcol;
 
 
 
-/* RENDERTARGETS: 0 */
-layout(location = 0) out vec4 col0;
+/* RENDERTARGETS: 1 */
+layout(location = 0) out vec4 col1;
 
 void main()
 {
     // Write.
-    col0 = vcol;
+    col1 = vcol;
 }
 
 #endif

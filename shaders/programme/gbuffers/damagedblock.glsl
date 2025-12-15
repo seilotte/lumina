@@ -22,6 +22,7 @@ void main()
 
 
     gl_Position = proj4(mProj, mul3(mMV, vaPosition));
+//     gl_Position.x = gl_Position.x * 0.5 - gl_Position.w * 0.5; // downscale
 }
 
 #endif
@@ -44,8 +45,8 @@ uniform sampler2D gtexture; // not atlas
 
 
 
-/* RENDERTARGETS: 0 */
-layout(location = 0) out vec4 col0;
+/* RENDERTARGETS: 1 */
+layout(location = 0) out vec4 col1;
 
 void main()
 {
@@ -56,7 +57,7 @@ void main()
 
 
     // Write.
-    col0 = albedo;
+    col1 = albedo;
 }
 
 #endif

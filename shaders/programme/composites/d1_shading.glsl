@@ -39,16 +39,16 @@ in vec2 uv;
 
 uniform sampler2D noisetex;
 uniform sampler2D cloudtex; // clouds.png
-uniform sampler2D depthtex0;
 
-uniform sampler2D colortex0; // albedo.rgb, diffuse.a
-uniform sampler2D colortex9; // sky.rgb
-uniform sampler2D colortex8; // coloured_lights.rgb
-uniform usampler2D colortex7; // data.r
-uniform sampler2D colortex5; // ao.r, shadows.g, pixel_age.b
-// uniform sampler2D colortex4; // gi.rgb
+uniform sampler2D colortex0; // sky.rgb
+uniform sampler2D colortex1; // albedo.rgb (opaque) -> final.rgb
+uniform sampler2D colortex3; // depth.r, pos_vs_pixelated.gba (opaque)
+uniform usampler2D colortex5; // data.r (opaque)
+uniform sampler2D colortex7; // ao.r, shadows.g, pixel_age.b
+// uniform sampler2D colortex8; // gi.rgb
+uniform sampler2D colortex10; // coloured_lights.rgb (previous)
 
-const bool colortex0MipmapEnabled = true;
+const bool colortex1MipmapEnabled = true;
 
 // =========
 
@@ -87,62 +87,67 @@ vec2 get_prev_screen(vec3 p)
 
 
 
-/* RENDERTARGETS: 0,9 */
-layout(location = 0) out vec3 col0;
-layout(location = 1) out vec3 col9;
+/* RENDERTARGETS: 1 */
+layout(location = 0) out vec3 col1;
 
 void main()
 {
+    // Initialize values.
+//     col1 = vec3(0.0);
+
+
+
     ivec2 texel = ivec2(gl_FragCoord);
 
-    vec4 c0 = texelFetch(colortex0, texel, 0);
-    uint c7 = texelFetch(colortex7, texel, 0).r;
-
-    // TODO: Avoid writing to the sky colortexN.
-    // Determine how to use the fog colour when clearing the texture.
-    col0 = isEyeInWater > 1 ? fogColor : c0.rgb;
-    col9 = isEyeInWater > 1 ? fogColor : texelFetch(colortex9, texel, 0).rgb;
-
-    if (c7 < 1u) return; // is_sky
-
-    vec3 c8 = vec3(1.0, 0.8, 0.6);
-    vec2 c5 = vec2(1.0);
-    vec3 c4 = vec3(0.0);
+    vec3 c0 = textureLod(colortex0, uv, 0.0).rgb;
+    vec4 c1 = textureLod(colortex1, uv, 0.0);
+    uint c5 = texelFetch(colortex5, texel, 0).r;
 
 
+    // NOTE: Not trully "is_sky", some gbuffers are missing.
+    if (c5 < 1u) // is_sky
+    {
+        col1 = c0 + c1.rgb;
+        return;
+    }
 
-    vec3 pos_ss = vec3(uv, texelFetch(depthtex0, texel, 0).r); // ss
-    vec3 pos_vs = unproj3(gProjInv, pos_ss * 2.0 - vec3(1.0, 1.0, 1.00000048));
-    vec3 pos_ft = mul3(gMVInv, pos_vs);
+    vec2 c7 = vec2(1.0); // ao
+    vec3 c8 = vec3(0.0); // gi
+    vec3 c10 = vec3(1.0, 0.8, 0.6); // lights
+
+
+
+    vec3 pos_ss = vec3(uv, texelFetch(colortex3, texel, 0));
+    vec3 pos_vs = unproj3(gProjInv, pos_ss * 2.0 - 1.0);
+    vec3 pos_sc = mul3(gMVInv, pos_vs);
 
     vec2 uv_lightmap;
-    uv_lightmap.x = float((c7 >> 9u) & 31u) / 31.0;
-    uv_lightmap.y = float((c7 >> 4u) & 31u) / 31.0;
-    float is_emissive = float((c7 >> 1u) & 7u) / 7.0;
+    uv_lightmap.x = float((c5 >> 9u) & 31u) / 31.0;
+    uv_lightmap.y = float((c5 >> 4u) & 31u) / 31.0;
+    float is_emissive = float((c5 >> 1u) & 7u) / 7.0;
 
 
 
     #if defined LIGHTS_COLOURED
 
         // NOTE: We cannot debug this here. Use the "final" programme.
-        vec2 uv_prev = get_prev_screen(pos_ft);
+        vec2 uv_prev = get_prev_screen(pos_sc);
 
-        c8 = texture(colortex8, uv_prev).rgb + vec3(1e-5, 8e-6, 6e-6);
-        c8 = c8 * inversesqrt(dot(c8, c8)); // normalize()
+        c10 = textureLod(colortex10, uv_prev, 0.0).rgb + vec3(1e-5, 8e-6, 6e-6);
+        c10 = c10 * inversesqrt(dot(c10, c10)); // normalize()
 
     #endif
 
     #if defined SS_AO || defined SS_SHADOWS || defined SS_GI
 
         // TODO: Upscale?
-//         c5 = texelFetch(colortex5, ivec2(uv * textureSize(colortex5, 0)), 0).rg;
-        c5 = texelFetch(colortex5, ivec2(uv * u_viewResolution.xy * SS_AO_RES), 0).rg;
+        c7 = textureLod(colortex7, uv, 0.0).rg;
 
     #endif
 
     #if defined SS_GI
 
-//         c4 = texelFetch(colortex4, ivec2(uv * textureSize(colortex4, 0)), 0).rgb;
+//         c8 = textureLod(colortex8, uv, 0.0).rgb;
 
         {
 //             float gi_mip = max(0.167, (pos_vs.z + vxFar) / vxFar) * 6.0;
@@ -153,13 +158,13 @@ void main()
             vec2 slope = vec2(dFdx(pos_ss.z), dFdy(pos_ss.z));
             slope *= rsqrt_fast(dot(slope, slope)) * 0.02;
 
-            vec4 gi_albedo = textureLod(colortex0, uv + slope, gi_mip);
+            vec4 gi_albedo = textureLod(colortex1, uv + slope, gi_mip);
 
             // albedo * diffuse * (1 - ao)
-            c4 = gi_albedo.rgb * (1.0 - c5.r);
-            c4 *= u_lightColor.rgb * gi_albedo.a;
-            c4 = /*pow(c4, vec3(1.2)) * 9.0*/ c4 * 9.0;
-            c4 = c4 / (c4 + 1.0);
+            c8 = gi_albedo.rgb * (1.0 - c7.r);
+            c8 *= u_lightColor.rgb * gi_albedo.a;
+            c8 = /*pow(c8, vec3(1.2)) * 9.0*/ c8 * 9.0;
+            c8 = c8 / (c8 + 1.0);
         }
 
     #endif
@@ -172,18 +177,18 @@ void main()
         // [fayer3]
         // Cloud Shadows.
         // Modified.
-        vec2 uv_clouds = pos_ft.xz;
+        vec2 uv_clouds = pos_sc.xz;
 //         vec2 uv_clouds = mul3(gMV, pos_vs + u_shadowLightDirection * cloudHeight).xz;
 
         // 3072.0 is one full cloud cycle
-        uv_clouds = mod(pos_ft.xz, vec2(3072.0)) + cameraPosition.xz;
+        uv_clouds = mod(pos_sc.xz, vec2(3072.0)) + cameraPosition.xz;
 //         uv = mod(uv, vec2(3072.0)) + vec2(cameraPositionInt.xz) + cameraPositionFract.xz; // better
 
         uv_clouds += vec2(mod(cloudTime, 3072.0), 4.0); // 4.0 = magic_value_offset
         uv_clouds /= 3072.0;
 
         // TODO: Cloud texture interpolation, linear.
-        c5.g *= 1.0 - texture(cloudtex, uv_clouds).r * uv_lightmap.y * 0.6;
+        c7.g *= 1.0 - texture(cloudtex, uv_clouds).r * uv_lightmap.y * 0.6;
 
     #endif
 
@@ -194,7 +199,7 @@ void main()
 
     #if defined LIGHTS_HAND
 
-        vec3 pos_hand = (pos_ft + cameraPosition) - eyePosition;
+        vec3 pos_hand = (pos_sc + cameraPosition) - eyePosition;
         float light_len = sqrt_fast(dot(pos_hand, pos_hand));
 
         light_hand.r = 4.0 + 0.234 * heldBlockLightValue; // mix(4, 8, v / 15)
@@ -228,7 +233,7 @@ void main()
 
     #if AO_VANILLA < 1 && defined SS_AO && defined SS_GI
 
-        c5.r = c5.r * 1.3 - 0.3;
+        c7.r = c7.r * 1.3 - 0.3;
 
     #endif
 
@@ -240,24 +245,24 @@ void main()
     shading = fogColor * mix(10.0, 1.0, skyColor.b) * AMBIENT_STRENGTH;
 
     // light
-    float light = c0.a * c5.g * uv_lightmap.y;
+    float light = c1.a * c7.g * uv_lightmap.y;
 
     shading += u_lightColor.rgb * (light * DIFFUSE_STRENGTH);
-    shading += c4.rgb; // gi
+    shading += c8.rgb; // gi
 
     // lights
-    shading += (c8.rgb * uv_lightmap.x + light_hand + light_hand2)
+    shading += (c10.rgb * uv_lightmap.x + light_hand + light_hand2)
     * (LIGHTS_STRENGTH - light * skyColor.b);
 
     // finalize
     #if !defined WHITE_WORLD
 
-        shading = mix(shading * c5.r, vec3(EMISSIVE_STRENGTH), is_emissive); // ao
-        shading *= c0.rgb; // albedo
+        shading = mix(shading * c7.r, vec3(EMISSIVE_STRENGTH), is_emissive); // ao
+        shading *= c1.rgb; // albedo
 
     #else
 
-        shading = mix(shading * c5.r, vec3(EMISSIVE_STRENGTH) * c0.rgb, is_emissive);
+        shading = mix(shading * c7.r, vec3(EMISSIVE_STRENGTH) * c1.rgb, is_emissive);
 
     #endif
 
@@ -267,18 +272,18 @@ void main()
     if (uv.x < 0.5)
     {
         // Correct version.
-//         vec3 ambient = c5.r * u_skyColor * u_fogColor * AMBIENT_STRENGTH;
-        vec3 ambient = c5.r * fogColor * mix(10.0, 1.0, skyColor.b) * AMBIENT_STRENGTH;
+//         vec3 ambient = c7.r * u_skyColor * u_fogColor * AMBIENT_STRENGTH;
+        vec3 ambient = c7.r * fogColor * mix(10.0, 1.0, skyColor.b) * AMBIENT_STRENGTH;
 
         vec3 light = u_lightColor.rgb;
-        light *= c0.a * c5.g * uv_lightmap.y * DIFFUSE_STRENGTH; // diffuse * shadows
+        light *= c1.a * c7.g * uv_lightmap.y * DIFFUSE_STRENGTH; // diffuse * shadows
 
-        light = c0.rgb * light + c0.rgb * c4.rgb; // diffuse + gi
+        light = c1.rgb * light + c1.rgb * c8.rgb; // diffuse + gi
 
-        vec3 lights = c8.rgb; // col
+        vec3 lights = c10.rgb; // col
         lights *= uv_lightmap.x * (LIGHTS_STRENGTH - skyColor.b);
 
-        shading = mix(ambient + light + lights, c0.rgb, is_emissive);
+        shading = mix(ambient + light + lights, c1.rgb, is_emissive);
     }
 //*/
 
@@ -288,7 +293,7 @@ void main()
     #if defined FOG_BORDER || defined FOG_HEIGHT
 
         float fog = 0.0;
-        float pos_len = sqrt_fast(dot(pos_ft, pos_ft)); // length()
+        float pos_len = sqrt_fast(dot(pos_sc, pos_sc)); // length()
 
 
 
@@ -307,7 +312,7 @@ void main()
 
         #if defined FOG_HEIGHT
 
-            vec3 pos_ws = pos_ft + cameraPosition;
+            vec3 pos_ws = pos_sc + cameraPosition;
 
             float height = abs(pos_ws.y - 63.0); // sea level = 63
             height = linearstep(16.0, -16.0, height); // 1 chunk = 16
@@ -332,23 +337,23 @@ void main()
 
 
         // Write.
-        shading = mix(shading, col9, fog); // sky
+        shading = mix(shading, c0, fog); // sky
 
     #endif
 //*/
 
 
 
-    #if defined DEBUG && DEBUG_MODE == 40
+    #if defined DEBUG && DEBUG_MODE == 80
 
-        shading = c4.rgb;
+        shading = c8.rgb;
 
     #endif
 
 
 
     // Write.
-    col0 = shading;
+    col1 = shading;
 }
 
 #endif

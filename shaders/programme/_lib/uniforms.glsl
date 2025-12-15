@@ -4,6 +4,8 @@ uniform vec3 u_shadowLightDirection;
 uniform vec4 u_viewResolution;
 uniform vec4 u_lightColor;
 
+uniform vec4 u_mat2ShadowAlign; // mat2(variable)
+
 // =========
 
 uniform int renderStage;

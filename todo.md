@@ -2,6 +2,7 @@
 
 ## Fixes
 - Voxy transluceny!
+- Screen space reflections.
 
 ## Features
 - Lens flare.

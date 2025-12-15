@@ -37,7 +37,9 @@ void main()
 //         #define CLOUDS_RENDER_DISTANCE 2048.0 // 1 chunk = 16
 
         float fog = sqrt_fast(dot(gl_Vertex.xyz, gl_Vertex.xyz)); // length()
-        fog = linearstep(CLOUDS_RENDER_DISTANCE, 16.0, fog);
+        fog = isEyeInWater > 1 // in_lava & in_snow
+        ? linearstep(fogEnd, fogStart, fog)
+        : linearstep(CLOUDS_RENDER_DISTANCE, 16.0, fog);
 
         gradient = min(gradient, fog);
 
@@ -46,6 +48,7 @@ void main()
 
 
     gl_Position = proj4(gl_ProjectionMatrix, mul3(gl_ModelViewMatrix, gl_Vertex.xyz));
+//     gl_Position.x = gl_Position.x * 0.5 - gl_Position.w * 0.5; // downscale
 }
 
 #endif
@@ -63,30 +66,33 @@ void main()
 in float gradient;
 // in vec3 vcol;
 
-uniform sampler2D colortex9; // sky.rgb
+// NOTE: colortex0 is bound, use the image.
+layout(binding = 0, rgba8) readonly uniform image2D colorimg0; // sky.rgb
 
 // =========
 
 
 
-/* RENDERTARGETS: 0,1,10 */
-layout(location = 0) out vec4 col0;
-layout(location = 1) out vec4 col1;
-layout(location = 2) out vec4 col10;
+/* RENDERTARGETS: 1,2,6 */
+layout(location = 0) out vec4 col1;
+layout(location = 1) out vec4 col2;
+layout(location = 2) out uint col6;
 
 void main()
 {
     vec3 col = mix(vec3(0.2, 0.21, 0.23), vec3(0.9, 0.9, 0.95), skyColor.bbb);
-    vec3 col_fog = texelFetch(colortex9, ivec2(gl_FragCoord), 0).rgb;
+//     vec3 col_fog = imageLoad(colorimg0, ivec2(gl_FragCoord.x, gl_FragCoord.y * 0.5)).rgb;
+    vec3 col_fog = imageLoad(colorimg0, ivec2(gl_FragCoord) / 2).rgb;
 
+    // NOTE: The stars will render in "front"...
     col = mix(col_fog, col, gradient);
 
 
 
     // Write.
-    col0 = vec4(col, 1.0);
-    col1 = vec4(1.0);
-    col10 = vec4(0.0);
+    col1 = vec4(col, 1.0);
+    col2 = vec4(0., 0., 0., 1.); // curse entitites
+    col6 = 14u;
 }
 
 #endif

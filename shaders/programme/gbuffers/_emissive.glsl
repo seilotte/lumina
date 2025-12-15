@@ -66,6 +66,7 @@ void main()
 
 
     gl_Position = proj4(mProj, mul3(mMV, position));
+//     gl_Position.x = gl_Position.x * 0.5 - gl_Position.w * 0.5; // downscale
 }
 
 #endif
@@ -89,13 +90,13 @@ uniform sampler2D gtexture; // atlas
 
 
 
-/* RENDERTARGETS: 0,7,1,10,17 */
-layout(location = 0) out vec4 col0;
-layout(location = 1) out uint col7;
-
-layout(location = 2) out vec4 col1;
-layout(location = 3) out vec4 col10;
-layout(location = 4) out uint col17;
+/* RENDERTARGETS: 1,2,3,4,5,6 */
+layout(location = 0) out vec4 col1;
+layout(location = 1) out vec4 col2;
+layout(location = 2) out vec4 col3;
+layout(location = 3) out vec4 col4;
+layout(location = 4) out uint col5;
+layout(location = 5) out uint col6;
 
 void main()
 {
@@ -130,13 +131,13 @@ void main()
 
 
     // Write.
-//     col0 = vec4(0, 1, 0, 1); // debug
-    col0 = albedo;
-    col7 = 14u; // 3; uint(is_emissive * 7.0 + dither) << 1u
-
-    col1 = vec4(1.0);
-    col10 = vec4(0.0);
-    col17 = 14u;
+//     col1 = vec4(0, 1, 0, 1); // debug
+    col1 = albedo;
+    col2 = vec4(0., 0., 0., 1.); // curse entitites
+    col3 = vec4(gl_FragCoord.z, 0., 0., 0.); // NOTE: No .gba, emissives do not have effects.
+    col4 = vec4(gl_FragCoord.z, 0., 0., 0.);
+    col5 = 14u; // 3; uint(is_emissive * 7.0 + dither) << 1u
+    col6 = 14u;
 }
 
 #endif
