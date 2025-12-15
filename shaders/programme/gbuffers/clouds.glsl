@@ -92,7 +92,7 @@ void main()
     // Write.
     col1 = vec4(col, 1.0);
     col2 = vec4(0., 0., 0., 1.); // curse entitites
-    col6 = 14u;
+    col6 = 0u;
 }
 
 #endif
