@@ -62,6 +62,9 @@ option.SS_AO = §6Ambient Occlusion §e[!]
         value.SS_AO_MODE.0 = SSAO
         value.SS_AO_MODE.1 = GTAO
 option.SS_GI = §6Global Illuination §e[!]
+    option.SS_GI_MODE = Mode
+        value.SS_GI_MODE.0 = Project §7(fast)
+        value.SS_GI_MODE.1 = Ray March §7(slow)
 
     # shadows
 option.SS_SHADOWS = §6Shadows §e[!]

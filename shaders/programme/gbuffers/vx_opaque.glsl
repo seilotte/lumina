@@ -129,8 +129,9 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
         parameters.face >> 1u == 1u
     ) * (float(parameters.face & 1u) * 2.0 - 1.0);
 
+    // NOTE: Verify on each Voxy update.
     if (
-        useCutout() && // (interData.x & 1u) == 1u; we are patching
+        (interData.x & 1u) == 1u && // cutout/discard
         parameters.customId > 99 && parameters.customId < 110
     )
     {

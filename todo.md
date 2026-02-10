@@ -1,8 +1,7 @@
 # To Do List
 
 ## Fixes
-- Voxy transluceny!
-- Screen space reflections.
+- Screen space reflections (fog).
 
 ## Features
 - Lens flare.

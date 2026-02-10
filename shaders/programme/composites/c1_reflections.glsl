@@ -151,7 +151,7 @@ void main()
 
 
 
-/*
+//*
 #if defined SS_R && SS_R_MODE == 1
 
     // [fclem]? https://github.com/blender/blender
@@ -173,7 +173,7 @@ void main()
     vec4 rd;
 
     ro.xyz = proj3(gProj, pos_vs); // 2ndc
-    rd.xyz = proj3(gProj, pos_vs + ref_vs);
+    rd.xyz = proj3(gProj, pos_vs + ref_vs * abs(pos_vs.z));
 
     ro.w = pos_vs.z - THICKNESS;
     rd.w = pos_vs.z + ref_vs.z - THICKNESS;
@@ -221,83 +221,6 @@ void main()
             mask = 1.0;
             break;
         }
-    }
-
-
-
-    vec3 ssr = textureLod(colortex1, uv_hit, 0.0).rgb * mask;
-
-    mask *= 1.0 - dot(normal_vs, view_vs); // NoV
-    mask *= is_hand ? 1.0 : (abs(uv_hit.x - 0.5) *2.-1.) * (abs(uv_hit.y - 0.5) *2.-1.); // vignette
-//     mask *= max(is_metal, 1.0 - is_roughness);
-
-
-
-    // Write.
-    col9 = vec4(ssr, mask);
-
-#endif
-//*/
-
-
-
-
-//*
-#if defined SS_R && SS_R_MODE == 1
-
-    // [mateuskreuch] https://github.com/mateuskreuch/minecraft-miniature-shader
-    // Screen Space Reflections.
-    // Modified.
-//     #define SS_R_ITERS 8
-
-    // NOTE: Normals require a float buffer for reflections.
-    // An inaccurate workaround is to offset the reflection vector slightly.
-    #define MAGIC_VALUE vec3(0.0, 0.06, 0.0)
-
-    vec3 ref_vs = normalize_fast(reflect(-view_vs - MAGIC_VALUE, normal_vs));
-
-
-
-    // TODO: Temporary solution until I fix the other algorithm.
-    float rcp_ref = 1.0 / abs(ref_vs.z);
-    float rcp_far = 1.0 / (2.0 * vxFar);
-    float len_r = 1.0;
-    float z, z_vs, z_delta;
-
-    vec2 r_ss;
-
-    vec3 r_vs;
-    vec3 r_vs_old = pos_vs;
-
-
-
-    vec2 uv_hit = vec2(-10.0);
-    float mask = 0.0;
-
-    for (int i = 0; i < SS_R_ITERS; ++i)
-    {
-        r_vs = pos_vs + ref_vs * len_r * dither;
-        r_ss = proj3(gProj, r_vs).xy * 0.5 + 0.5;
-        if (clamp(r_ss.xy, 0.0, 1.0) != r_ss.xy) continue;
-
-        z = textureLod(colortex4, r_ss.xy, 0.0).r;
-        z_vs = gProjInv[3].z / (gProjInv[2].w * (z * 2.0 - 1.0) + gProjInv[3].w);
-//         if (z == 1.0) continue;
-
-        z_delta = r_vs.z - z_vs * 1.000002;
-
-        if (
-            z_delta < 0.0 // hit
-            && z * 1.01 > pos_ss.z // thickness
-        )
-        {
-            uv_hit = r_ss;
-            mask = 1.0;
-            break;
-        }
-
-        r_vs_old = r_vs;
-        len_r += abs(z_delta) * rcp_ref * 1.6; // step size
     }
 
 

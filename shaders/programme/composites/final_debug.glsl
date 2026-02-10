@@ -47,7 +47,7 @@ uniform sampler2D colortex4; // depth.r, pos_vs_pixelated.gba (translucent)
 uniform usampler2D colortex5; // data.r (opaque)
 uniform usampler2D colortex6; // data.r (translucent)
 uniform sampler2D colortex7; // ao.r, shadows.g, pixel_age.b
-// uniform sampler2D colortex8; // gi.rgb
+uniform sampler2D colortex8; // gi.rgb
 uniform sampler2D colortex9; // reflections.rgb, reflections_mask.a
 uniform sampler2D colortex10; // coloured_lights.rgb
 uniform sampler2D colortex11; // final_prev.rgb
@@ -77,9 +77,8 @@ struct s_Data
 #define custom_text(SIDE, TEXT0, IDX, IDX_COL, CHANNELS) \
 { \
     begin_text( \
-        texel / 3, \
-        ivec2((u_viewResolution.x / 3) * 0.01) + \
-        ivec2((u_viewResolution.x / 3) * 0.5 * SIDE, 7 * 4) \
+        ivec2(uv * vec2(210.0) * vec2(aspectRatio, 1.0)), \
+        ivec2( vec2(210.0 * 0.01 + 210.0 * 0.5 * SIDE, 210.0 * 0.2) * vec2(aspectRatio, 1.0) ) \
     ); \
     \
     if (TEXT0 != _space) print(TEXT0); \
@@ -186,7 +185,7 @@ void main()
         uint c5 = texelFetch(colortex5, texel L, 0).r;
              c5 += texelFetch(colortex6, texel R, 0).r;
         vec4 c7 = texelFetch(colortex7, ivec2(uv * textureSize(colortex7, 0)), 0);
-        vec4 c8 = texelFetch(colortex1 /* colortex8 */, texel, 0);
+        vec4 c8 = texelFetch(colortex8, ivec2(uv * textureSize(colortex8, 0)), 0);
         vec4 c9 = texelFetch(colortex9, ivec2(uv * textureSize(colortex9, 0)), 0);
         vec4 c10 = texelFetch(colortex10, ivec2(uv * textureSize(colortex10, 0)), 0);
         vec4 c11 = texelFetch(colortex11, texel, 0);
@@ -204,7 +203,7 @@ void main()
         data.uv_lightmap.y = float((c5 >> 4u) & 31u) / 31.0;
 
         data.is_emissive = float((c5 >> 1u) & 7u) / 7.0;
-        data.is_metal = float(c5 & 1u); // float((c8 >> 0u) & 1u) / 1.0;
+        data.is_metal = float(c5 & 1u); // float((c5 >> 0u) & 1u) / 1.0;
 
 
 
@@ -301,8 +300,11 @@ void main()
 
         #elif DEBUG_MODE == 80
 
-//             debug = c8.rgb;
-            debug = texelFetch(colortex1, texel, 0).rgb; // d1_shading.glsl
+            #if SS_GI_MODE == 1
+                debug = c8.rgb;
+            #else
+                debug = texelFetch(colortex1, texel, 0).rgb; // d1_shading.glsl
+            #endif
             custom_text(0, (_G,_l,_o,_b,_a,_l,_space,_I,_l,_l,_u,_m,_i,_n,_a,_t,_i,_o,_n), (_space,_8,_0), (_8), (_r,_g,_b))
 
         #elif DEBUG_MODE == 90

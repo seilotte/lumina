@@ -40,10 +40,12 @@ in vec2 uv;
 
 uniform sampler2D noisetex;
 
+uniform sampler2D colortex1; // albedo.rgb (opaque)
 uniform sampler2D colortex3; // depth.r, pos_vs_pixelated.gba (opaque)
 uniform usampler2D colortex5; // data.r (opaque)
 
 uniform sampler2D colortex7; // ao.r, shadows.g, pixel_age.b (previous)
+uniform sampler2D colortex8; // gi.rgb (previous)
 
 // =========
 
@@ -122,14 +124,15 @@ vec3 get_prev_screen(vec3 p)
 
 
 
-/* RENDERTARGETS: 7 */
+/* RENDERTARGETS: 7,8 */
 layout(location = 0) out vec3 col7;
+layout(location = 1) out vec3 col8;
 
 void main()
 {
     // Initialize values.
     col7 = vec3(1.0, 1.0, 0.0);
-//     col8 = vec3(0.0);
+    col8 = vec3(0.0);
 
 
 
@@ -199,7 +202,7 @@ void main()
 
 
     float ao = 0.0; // ambient occlusion
-//     vec3 gi = vec3(0.0); // global illumination or emissives
+    vec3 gi = vec3(0.0); // global illumination or emissives
 
     for (float i = 1.0; i <= SS_AO_ITERS; ++i)
     {
@@ -225,24 +228,40 @@ void main()
         {
             float cos_theta = max(0.001, dot(normal_vs, delta * rsqrt_fast(dot(delta, delta))));
 
-            ao += cos_theta;
+            #if defined SS_AO || (defined SS_GI && SS_GI_MODE == 0)
 
-//             vec4 c0 = textureLod(colortex0, sam_ss, 0.0);
-//             gi += c0.rgb * c0.a * u_lightColor.rgb * cos_theta; // diffuse = c0.rgb * c0.a * col_light
+                ao += cos_theta;
+
+            #endif
+
+            #if defined SS_GI && SS_GI_MODE == 1
+
+                vec4 c1 = textureLod(colortex1, sam_ss, 0.0);
+                gi += c1.rgb * c1.aaa * u_lightColor.rgb * cos_theta; // diffuse = c1.rgb * c1.a * col_light
+
+            #endif
         }
     }
 
-    ao = (ao * rcp_iters) * 3.0; // intensity
-    ao = 1.0 - ao / (ao + 1.0);
+    #if defined SS_AO || (defined SS_GI && SS_GI_MODE == 0)
 
-//     gi = (gi * rcp_iters) * 9.0; // intensity
-//     gi = gi / (gi + 1.0);
+        ao = (ao * rcp_iters) * 3.0; // intensity
+        ao = 1.0 - ao / (ao + 1.0);
+
+    #endif
+
+    #if defined SS_GI && SS_GI_MODE == 1
+
+        gi = (gi * rcp_iters) * 9.0; // intensity
+        gi = gi / (gi + 1.0);
+
+    #endif
 
 
 
     // Write.
     col7.r = ao;
-//     col8 = gi;
+    col8 = gi;
 
 #endif
 #endif
@@ -283,7 +302,7 @@ void main()
 
 
     float ao = 0.0; // ambient occlusion
-//     vec3 gi = vec3(0.0); // global illumination or emissives
+    vec3 gi = vec3(0.0); // global illumination or emissives
 
     for (float j = 1.0; j <= SS_AO_DIRS; ++j)
     {
@@ -350,40 +369,54 @@ void main()
             uint occ_bits0 = update_sectors(horizons0.xy);
             uint occ_bits1 = update_sectors(horizons1.yx);
 
-//             {
-//                 uint vis_bits0 = occ_bits0 & ~occ_bits;
-//                 uint vis_bits1 = occ_bits1 & ~occ_bits;
-//
-//                 if (vis_bits0 != 0u || vis_bits1 != 0u)
-//                 {
-//                     float vis0 = float(bitCount(vis_bits0)) * 0.03125;
-//                     float vis1 = float(bitCount(vis_bits1)) * 0.03125;
-//
-//                     vec4 c0 = textureLod(colortex0, sam_ss0, 0.0);
-//                     gi += c0.rgb * c0.a * u_lightColor.rgb * vis0; // diffuse * vis0
-//
-//                     c0 = textureLod(colortex0, sam_ss1, 0.0);
-//                     gi += c0.rgb * c0.a * u_lightColor.rgb * vis1;
-//                 }
-//             }
+            #if defined SS_GI && SS_GI_MODE == 1
+            {
+                uint vis_bits0 = occ_bits0 & ~occ_bits;
+                uint vis_bits1 = occ_bits1 & ~occ_bits;
+
+                if (vis_bits0 != 0u || vis_bits1 != 0u)
+                {
+                    float vis0 = float(bitCount(vis_bits0)) * 0.03125;
+                    float vis1 = float(bitCount(vis_bits1)) * 0.03125;
+
+                    vec4 c1 = textureLod(colortex1, sam_ss0, 0.0);
+                    gi += c1.rgb * c1.a * u_lightColor.rgb * vis0; // diffuse * vis0
+
+                    c1 = textureLod(colortex1, sam_ss1, 0.0);
+                    gi += c1.rgb * c1.a * u_lightColor.rgb * vis1;
+                }
+            }
+            #endif
 
             occ_bits |= occ_bits0 | occ_bits1;
         }
 
-        ao += float(bitCount(occ_bits)) * 0.03125;
+        #if defined SS_AO || (defined SS_GI && SS_GI_MODE == 0)
+
+            ao += float(bitCount(occ_bits)) * 0.03125;
+
+        #endif
     }
 
-    ao = (ao * rcp_dirs) * 3.0; // intensity
-    ao = 1.0 - ao / (ao + 1.0);
+    #if defined SS_AO || (defined SS_GI && SS_GI_MODE == 0)
 
-//     gi = (gi * rcp_dirs) * 9.0; // intensity
-//     gi = gi / (gi + 1.0);
+        ao = (ao * rcp_dirs) * 3.0; // intensity
+        ao = 1.0 - ao / (ao + 1.0);
+
+    #endif
+
+    #if defined SS_GI && SS_GI_MODE == 1
+
+        gi = (gi * rcp_dirs) * 9.0; // intensity
+        gi = gi / (gi + 1.0);
+
+    #endif
 
 
 
     // Write.
     col7.r = ao;
-//     col8 = gi;
+    col8 = gi;
 
 #endif
 #endif
@@ -512,13 +545,14 @@ void main()
 
 
     // Write.
-    #if defined SS_AO_ACCUM || defined SS_SHADOWS_ACCUM || 1
+    #if defined SS_AO_ACCUM || defined SS_SHADOWS_ACCUM
 
         col7.rg += (c7.rg - col7.rg) * pixel_fac; // col7 = mix(col7, col7_prev, pixel_fac)
 
     #endif
 
-    #if defined SS_GI_ACCUM && 0
+//     #if defined SS_GI_ACCUM && SS_GI_MODE == 1
+    #if defined SS_AO_ACCUM && SS_GI_MODE == 1
 
         vec3 c8 = textureLod(colortex8, uv_prev.xy, 0.0).rgb; // gi_prev.rgb
         col8 += (c8 - col8) * pixel_fac;

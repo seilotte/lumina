@@ -32,15 +32,16 @@ Explore the shader settings or refer to [lumina/shaders/lang/en_GB.lang](./shade
 
 This shader was developed using the following versions:
 
-- Minecraft: 1.21.10
-- [Fabric](https://fabricmc.net/): 0.17.3
-- [Sodium](https://modrinth.com/mod/sodium): 0.7.2 Fabric
-- [Iris](https://modrinth.com/mod/iris): 1.9.6 Fabric
-- [Voxy](https://modrinth.com/mod/voxy): 0.2.6 (Alpha) Fabric
-- [SPBR](https://modrinth.com/resourcepack/spbr): 18.8
+- Minecraft: 1.21.11
+- [Fabric](https://fabricmc.net/): 0.18.4
+- [Sodium](https://modrinth.com/mod/sodium): 0.8.2 Fabric
+- [Iris](https://modrinth.com/mod/iris): 1.10.4 Fabric
+- [Voxy](https://modrinth.com/mod/voxy): 0.2.9 (Alpha) Fabric
+- [SPBR](https://modrinth.com/resourcepack/spbr): 19.6
 
 > [!NOTE]
 > *Compatibility is limited to Iris and for systems that support OpenGL 4.6.*
+> *Voxy versions below 0.2.6-alpha are not supported.*
 
 ## Credits
 

@@ -26,6 +26,7 @@ uniform float fogStart;
 uniform float fogEnd;
 uniform float cloudHeight;
 uniform float cloudTime;
+uniform float aspectRatio;
 
 uniform vec3 fogColor;
 uniform vec3 skyColor;

@@ -49,13 +49,13 @@ const int colortex4Format = RGBA32F;
 const int colortex5Format = R32UI;
 const int colortex6Format = R32UI;
 const int colortex7Format = RGB8;
-// const int colortex8Format = RGB8;
+const int colortex8Format = RGB8;
 const int colortex9Format = RGBA16F;
 const int colortex10Format = R11F_G11F_B10F;
 const int colortex11Format = RGB8;
 
 const bool colortex7Clear = false;
-// const bool colortex8Clear = false;
+const bool colortex8Clear = false;
 const bool colortex9Clear = false;
 const bool colortex10Clear = false;
 const bool colortex11Clear = false;
@@ -135,6 +135,7 @@ const vec4 colortex6ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
     // #define SS_GI_ITERS SS_AO_ITERS
     // #define SS_GI_ACCUM SS_AO_ACCUM
     // #define SS_GI_MODE SS_AO_MODE
+    #define SS_GI_MODE 1 // [0 1] 0=project 1=raymarch
 
     // shadows
 #define SS_SHADOWS
@@ -247,6 +248,8 @@ const vec4 colortex6ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
     #endif
 #ifdef SS_GI
 #endif
+    #ifdef SS_GI_MODE
+    #endif
 
 #ifdef CLOUDS_SHADOWS
 #endif

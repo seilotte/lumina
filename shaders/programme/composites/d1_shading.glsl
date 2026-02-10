@@ -45,7 +45,7 @@ uniform sampler2D colortex1; // albedo.rgb (opaque) -> final.rgb
 uniform sampler2D colortex3; // depth.r, pos_vs_pixelated.gba (opaque)
 uniform usampler2D colortex5; // data.r (opaque)
 uniform sampler2D colortex7; // ao.r, shadows.g, pixel_age.b
-// uniform sampler2D colortex8; // gi.rgb
+uniform sampler2D colortex8; // gi.rgb
 uniform sampler2D colortex10; // coloured_lights.rgb (previous)
 
 const bool colortex1MipmapEnabled = true;
@@ -138,32 +138,39 @@ void main()
 
     #endif
 
-    #if defined SS_AO || defined SS_SHADOWS || defined SS_GI
+    #if (defined SS_AO || (defined SS_GI && SS_GI_MODE == 0)) && defined SS_SHADOWS
 
         // TODO: Upscale?
         c7 = textureLod(colortex7, uv, 0.0).rg;
 
+    #elif defined SS_SHADOWS
+
+        c7.g = textureLod(colortex7, uv, 0.0).g;
+
     #endif
 
-    #if defined SS_GI
+    #if defined SS_GI && SS_GI_MODE == 1
 
-//         c8 = textureLod(colortex8, uv, 0.0).rgb;
+        c8 = textureLod(colortex8, uv, 0.0).rgb;
+
+    #elif defined SS_GI && SS_GI_MODE == 0
 
         {
+            // Fast Global Illumination.
 //             float gi_mip = max(0.167, (pos_vs.z + vxFar) / vxFar) * 6.0;
             float gi_mip = max(0.167, (pos_vs.z + 192.0) * 0.005208) * 6.0; // 12 chunks
 
-            // [rj200] https://github.com/rj200/Glamarye_Fast_Effects_for_ReShade
-            // Sample the texture a little bit in the normal direction.
-            vec2 slope = vec2(dFdx(pos_ss.z), dFdy(pos_ss.z));
-            slope *= rsqrt_fast(dot(slope, slope)) * 0.02;
+            vec3 normal_vs = vec3((uvec3(c5) >> uvec3(26u, 20u, 14u)) & uvec3(63u));
+            normal_vs = mat3(gMV) * (normal_vs / 63.0 * 2.0 - 1.0);
 
-            vec4 gi_albedo = textureLod(colortex1, uv + slope, gi_mip);
+            vec2 uv_slope = proj3(gProj, pos_vs + normal_vs * 0.5).xy * 0.5 + 0.5;
+
+            vec4 gi_albedo = textureLod(colortex1, uv_slope, gi_mip);
 
             // albedo * diffuse * (1 - ao)
             c8 = gi_albedo.rgb * (1.0 - c7.r);
             c8 *= u_lightColor.rgb * gi_albedo.a;
-            c8 = /*pow(c8, vec3(1.2)) * 9.0*/ c8 * 9.0;
+            c8 = c8 * 9.0; // pow(c8, vec3(1.2)) * 9.0
             c8 = c8 / (c8 + 1.0);
         }
 
@@ -344,7 +351,7 @@ void main()
 
 
 
-    #if defined DEBUG && DEBUG_MODE == 80
+    #if defined DEBUG && DEBUG_MODE == 80 && SS_GI_MODE == 0
 
         shading = c8.rgb;
 
