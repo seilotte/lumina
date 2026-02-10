@@ -40,7 +40,7 @@ This shader was developed using the following versions:
 - [SPBR](https://modrinth.com/resourcepack/spbr): 19.6
 
 > [!NOTE]
-> *Compatibility is limited to Iris and for systems that support OpenGL 4.6.*
+> *Compatibility is limited to Iris and for systems that support OpenGL 4.6.*<br>
 > *Voxy versions below 0.2.6-alpha are not supported.*
 
 ## Credits
