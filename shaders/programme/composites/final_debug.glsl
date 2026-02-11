@@ -177,7 +177,7 @@ void main()
         #define L * ivec2(2, 1)
         #define R * ivec2(2, 1) - ivec2(u_viewResolution.x, 0)
 
-        vec4 c0 = texelFetch(colortex0, texel / 2, 0);
+        vec4 c0 = texelFetch(colortex0, texel / 4, 0);
         vec4 c1 = texelFetch(colortex1, texel L, 0);
              c1 += texelFetch(colortex2, texel R, 0);
         vec4 c3 = texelFetch(colortex3, texel L, 0);

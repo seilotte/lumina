@@ -113,13 +113,14 @@ void main()
     uint c5 = texelFetch(colortex5, texel, 0).r;
 
 
+
     // NOTE: Not trully "is_sky", some gbuffers are missing.
     if (c5 < 1u) // is_sky
     {
         // [Builderb0y] https://github.com/Builderb0y
         // Stars.
         // Modified.
-        #define STARS_SIZE 96.0
+        #define STARS_SIZE 64.0
         #define STARS_AMOUNT 0.1 // [0, 1]
         #define STARS_INTENSITY 0.3
 
@@ -177,7 +178,7 @@ void main()
 
 
 
-        col1 = c0 + (c1.rgb + c_stars);
+        col1 = c0 + c1.rgb + c_stars;
         return;
     }
 

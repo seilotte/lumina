@@ -2,6 +2,7 @@
 
 ## Fixes
 - Screen space reflections (fog).
+- Optimizations (hi-z, fp16, etc.).
 
 ## Features
 - Lens flare.

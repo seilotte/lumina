@@ -82,7 +82,7 @@ void main()
 {
     vec3 col = mix(vec3(0.2, 0.21, 0.23), vec3(0.9, 0.9, 0.95), skyColor.bbb);
 //     vec3 col_fog = imageLoad(colorimg0, ivec2(gl_FragCoord.x, gl_FragCoord.y * 0.5)).rgb;
-    vec3 col_fog = imageLoad(colorimg0, ivec2(gl_FragCoord) / 2).rgb;
+    vec3 col_fog = imageLoad(colorimg0, ivec2(gl_FragCoord) / 4).rgb;
 
     // NOTE: The stars will render in "front"...
     col = mix(col_fog, col, gradient);

@@ -1,5 +1,5 @@
 /*
-    colortex0 | RGBA8 | 50% resolution
+    colortex0 | RGBA8 | 25% resolution
 [rgb][3x8] sky.rgb
 [a] Image format does not have rgb8.
 

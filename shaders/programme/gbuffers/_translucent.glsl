@@ -301,6 +301,13 @@ void main()
             uv0 += vec2(MAP_NW_SPEED, -MAP_NW_SPEED) * frameTimeCounter;
             uv1 -= vec2(MAP_NW_SPEED, -MAP_NW_SPEED) * frameTimeCounter;
 
+            float level;
+            level = max(abs(pos_sc.x), max(abs(pos_sc.y), abs(pos_sc.z)));
+            level = rcp_fast(floor(sqrt_fast(level) * 0.25) + 1.0);
+
+            uv0 *= level;
+            uv1 *= level;
+
             // NOTE: This is not the correct way to combine normal maps.
             // Watch: https://www.youtube.com/watch?v=S9sz00l3FqQ
             vec3 normal_map;
@@ -311,8 +318,6 @@ void main()
 
 //             normal_map.z = sqrt_fast(1.0 - dot(normal_map.xy, normal_map.xy));
             normal_map.z = 1.0;
-
-//             normal_vs = tbn_vs * normal_map;
 
             mat3 tbn; // vs
             tbn[2] = normal_vs;
@@ -543,7 +548,7 @@ void main()
 
         float fog = 0.0;
         float pos_len = sqrt_fast(dot(pos_sc, pos_sc)); // length()
-        vec3 c0 = imageLoad(colorimg0, ivec2(gl_FragCoord) / 2).rgb; // sky
+        vec3 c0 = imageLoad(colorimg0, ivec2(gl_FragCoord) / 4).rgb; // sky
 
 
 

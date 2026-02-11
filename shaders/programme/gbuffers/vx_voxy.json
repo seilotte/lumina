@@ -12,6 +12,7 @@
         "isEyeInWater",
 
         "frameTimeCounter",
+        "far",
         "fogStart",
         "fogEnd",
         "cloudTime",

@@ -47,7 +47,7 @@ void main()
 
     // NOTE: Stars, do not "downscale" accurately,
     // half resolution is sufficient.
-    gl_Position.xy = gl_Position.xy * 0.5 - gl_Position.w * 0.5; // x*res + x*(res-1)
+    gl_Position.xy = gl_Position.xy * 0.25 - gl_Position.w * 0.75; // x*res + x*(res-1)
 }
 
 #endif
@@ -118,7 +118,7 @@ void main()
 /*
     {
         // NOTE: Stars must be applied after fog.
-        // See "d1_shading.glsl".
+        // Moved to: `d1_shading.glsl`
 
         // [Builderb0y] https://github.com/Builderb0y
         // Stars.
