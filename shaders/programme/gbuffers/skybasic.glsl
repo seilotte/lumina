@@ -115,8 +115,11 @@ void main()
         // dither; x * 1.0/bit_range - 0.5/bit_range
         albedo += noise_r2(gl_FragCoord.xy) * 0.004 - 0.002;
     }
-
+/*
     {
+        // NOTE: Stars must be applied after fog.
+        // See "d1_shading.glsl".
+
         // [Builderb0y] https://github.com/Builderb0y
         // Stars.
         // Modified.
@@ -173,7 +176,7 @@ void main()
 
         albedo += col_stars;
     }
-
+//*/
 
 
     // Write.
