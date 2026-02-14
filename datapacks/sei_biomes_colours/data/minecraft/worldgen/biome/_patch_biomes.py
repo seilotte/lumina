@@ -65,7 +65,7 @@ BIOMES_DATA = (
     ('frozen_river',
         '12244761', '#FFFFFF', '1594256', '#FFFFFF'),
     ('grove',
-        '12048162', '#FFFFFF', '4501493', '#FFFFFF'),
+        '8495359', '#FFFFFF', '4501493', '#FFFFFF'),
     ('ice_spikes',
         '12244761', '#FFFFFF', '1332635', '#FFFFFF'),
     ('jagged_peaks',

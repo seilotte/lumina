@@ -244,7 +244,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
 
 
 
-    #if defined CLOUDS_SHADOWS
+    #if defined CLOUDS_SHADOWS && OVERWORLD
 
         // [null511] https://github.com/Null-MC
         // [fayer3]
@@ -285,6 +285,24 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
     #define DIFFUSE_STRENGTH 1.1
     #define LIGHTS_STRENGTH 1.2
     #define EMISSIVE_STRENGTH 1.1
+
+    #if defined NETHER
+
+        // TODO: Justify a "sun", `b0_skybox.glsl`.
+        vec3 u_lightColor = vec3(0.8, 0.7, 0.6);
+        vec3 skyColor = vec3(1.0);
+        uv_lightmap.y = 1.0;
+
+    #endif
+
+    #if defined END
+
+        // TODO: Justify a "sun", `b0_skybox.glsl`.
+        vec3 u_lightColor = vec3(0.75, 0.7, 0.8);
+        vec3 skyColor = vec3(1.0);
+        uv_lightmap.y = 1.0;
+
+    #endif
 
     vec3 shading;
 
@@ -348,7 +366,6 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
             float fog_end = isEyeInWater > 0 ? min(fogEnd, vxFar) : vxFar;
 
             fog = linearstep(fog_start, fog_end, pos_len); // 1 chunk = 16
-            fog = fog * fog;
 
         #endif
 
@@ -356,9 +373,17 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
 
         #if defined FOG_HEIGHT
 
+            #define SEA_LEVEL 63.0
+
+            #if defined NETHER
+
+                #define SEA_LEVEL  31.0
+
+            #endif
+
             vec3 pos_ws = pos_sc + cameraPosition;
 
-            float height = abs(pos_ws.y - 63.0); // sea level = 63
+            float height = abs(pos_ws.y - SEA_LEVEL);
             height = linearstep(16.0, -16.0, height); // 1 chunk = 16
 
             // masks

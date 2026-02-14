@@ -199,7 +199,12 @@ const vec4 colortex6ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 #if defined VOXY && \
 (defined RENDER_OPAQUE_VX || defined RENDER_TRANSLUCENT_VX)
 
-    #define vxFar float(vxRenderDistance)
+    #define vxFar float(vxRenderDistance * 16)
+
+    // NOTE: Limit to 32 chunks for gameplay.
+    #if defined NETHER
+        #define vxFar 512.0
+    #endif
 
 #else
 

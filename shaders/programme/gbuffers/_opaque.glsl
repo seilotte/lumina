@@ -318,7 +318,8 @@ void main()
 
 
 
-    #if defined MAP_SHADOW && !defined PHOTONICS_ENABLED
+    #if defined MAP_SHADOW
+    #if !defined NETHER && !defined PHOTONICS_ENABLED
 
         float pos_dist = dot(pos_sc, pos_sc);
         float max_dist = shadowDistance * shadowDistance;
@@ -340,11 +341,12 @@ void main()
             float depth = texture(shadowtex1, shadow_uv.xy).r;
 
             light *= 1.0 - fade * clamp(
-                3.0 * (depth - shadow_uv.z) / shadowProjection[2].z,
+                3.0 * (depth - shadow_uv.z) / sProj[2].z,
                 0.0, 1.0
             );
         }
 
+    #endif
     #endif
 
 

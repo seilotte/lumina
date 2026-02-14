@@ -2,13 +2,13 @@
 
 ## Fixes
 - Screen space reflections (fog).
-- Photonics tanslucent "shadow map".
+- Photonics translucent "shadow map".
+- Better support for the nether, the end.
 
 ## Features
 - Lens flare.
 - Refraction.
 - Skybox effects (aurora, end aurora, etc.).
-- Support the nether, the end.
 - Volumetric fog.
 - Water caustics (projected texture).
 - Optimizations (hi-z, fp16, etc.).

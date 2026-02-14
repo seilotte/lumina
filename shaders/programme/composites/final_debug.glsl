@@ -118,7 +118,6 @@ struct s_Data
 
 
 
-
 /* RENDERTARGETS: 0 */
 layout(location = 0) out vec3 debug;
 

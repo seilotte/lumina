@@ -153,7 +153,6 @@ void main()
             float fog_end = isEyeInWater > 0 ? min(fogEnd, vxFar) : vxFar;
 
             float fog = linearstep(fog_start, fog_end, pos_len);
-            fog = fog * fog;
 
             mask *= 1.0 - fog;
         }
@@ -262,7 +261,6 @@ void main()
             float fog_end = isEyeInWater > 0 ? min(fogEnd, vxFar) : vxFar;
 
             float fog = linearstep(fog_start, fog_end, pos_len);
-            fog = fog * fog;
 
             mask *= 1.0 - fog;
         }

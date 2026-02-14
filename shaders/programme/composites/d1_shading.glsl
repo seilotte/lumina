@@ -119,67 +119,79 @@ void main()
 
     if (c3 == 1.0) // is_sky
     {
-        // [Builderb0y] https://github.com/Builderb0y
-        // Stars.
-        // Modified.
-        #define STARS_SIZE 64.0
-        #define STARS_AMOUNT 0.1 // [0, 1]
-        #define STARS_INTENSITY 0.3
-
         vec3 c_stars = vec3(0.0);
 
-        vec3 pos_ws;
-        pos_ws = unproj3(gProjInv, vec3(uv * 2.0 - 1.0, 0.0));
-        pos_ws = pos_ws * inversesqrt(dot(pos_ws, pos_ws)); // normalize
-        pos_ws = mat3(gMVInv) * pos_ws;
+        #if defined OVERWORLD || defined END
 
-        vec3 pos_stars[2] = vec3[2]
-        (
-            vec3(
-                atan(pos_ws.z, pos_ws.x) * 0.318310, // x/pi+0.5
-                pos_ws.y * 0.5, // x/2+0.5
-                pos_ws.y
-            ),
-            vec3(
-                atan(pos_ws.z, pos_ws.y) * 0.318310,
-                pos_ws.x * 0.5,
-                pos_ws.x
-            )
-        );
+            // [Builderb0y] https://github.com/Builderb0y
+            // Stars.
+            // Modified.
+            #define STARS_SIZE 64.0
+            #define STARS_AMOUNT 0.1 // [0, 1]
+            #define STARS_INTENSITY 0.3
 
-        for (int i = 0; i < 2; ++i)
-        {
-            vec3 co = pos_stars[i];
-            co.xy *= vec2(STARS_SIZE * 1.31, STARS_SIZE);
+            #if defined END
 
-            vec3 dither = noise_wh(floor(co.xy));
+                #define STARS_SIZE 96.0
+                #define STARS_INTENSITY 0.15
 
-            co.xy = fract(co.xy) - mix(dither.xy, vec2(0.5), dither.z); // offset
+            #endif
 
-            float n = dither.x * 6.283185; // angle
-            co.xy = vec2( // rotate around the z-axis
-                co.x * cos(n) - sin(n) * co.y,
-                co.x * sin(n) + cos(n) * co.y
+            vec3 pos_ws;
+            pos_ws = unproj3(gProjInv, vec3(uv * 2.0 - 1.0, 0.0));
+            pos_ws = pos_ws * inversesqrt(dot(pos_ws, pos_ws)); // normalize
+            pos_ws = mat3(gMVInv) * pos_ws;
+
+            vec3 pos_stars[2] = vec3[2]
+            (
+                vec3(
+                    atan(pos_ws.z, pos_ws.x) * 0.318310, // x/pi+0.5
+                    pos_ws.y * 0.5, // x/2+0.5
+                    pos_ws.y
+                ),
+                vec3(
+                    atan(pos_ws.z, pos_ws.y) * 0.318310,
+                    pos_ws.x * 0.5,
+                    pos_ws.x
+                )
             );
 
-            co.xy *= co.xy; // square
+            for (int i = 0; i < 2; ++i)
+            {
+                vec3 co = pos_stars[i];
+                co.xy *= vec2(STARS_SIZE * 1.31, STARS_SIZE);
 
-            float mask;
-            mask = 1.0 - clamp(dot(co.xy, co.xy) / (dither.z * 0.001), 0.0, 1.0); // star
-            mask *= clamp((0.7 - abs(co.z)) * 3.333, 0.0, 1.0); // borders
-            mask *= float(dither.z < STARS_AMOUNT) * STARS_INTENSITY;
-            mask *= 1.0 - skyColor.b; // is_night
+                vec3 dither = noise_wh(floor(co.xy));
 
-            vec3 col;
-            col = vec3(0.6, 0.8, 1.0); // .25 .5 1.
-            col *= (dither.z / STARS_AMOUNT) * 9.0 - 8.0;
-            col = exp2(col) * mask;
+                co.xy = fract(co.xy) - mix(dither.xy, vec2(0.5), dither.z); // offset
 
-            c_stars += col;
-        }
+                float n = dither.x * 6.283185; // angle
+                co.xy = vec2( // rotate around the z-axis
+                    co.x * cos(n) - sin(n) * co.y,
+                    co.x * sin(n) + cos(n) * co.y
+                );
+
+                co.xy *= co.xy; // square
+
+                float mask;
+                mask = 1.0 - clamp(dot(co.xy, co.xy) / (dither.z * 0.001), 0.0, 1.0); // star
+                mask *= clamp((0.7 - abs(co.z)) * 3.333, 0.0, 1.0); // borders
+                mask *= float(dither.z < STARS_AMOUNT) * STARS_INTENSITY;
+                mask *= 1.0 - skyColor.b; // is_night
+
+                vec3 col;
+                col = vec3(0.6, 0.8, 1.0); // .25 .5 1.
+                col *= (dither.z / STARS_AMOUNT) * 9.0 - 8.0;
+                col = exp2(col) * mask;
+
+                c_stars += col;
+            }
+
+        #endif
 
 
 
+        // Write.
         col1 = c0 + c1.rgb + c_stars;
         return;
     }
@@ -244,7 +256,8 @@ void main()
 
 
 
-    #if defined MAP_SHADOW && defined PHOTONICS_ENABLED
+    #if defined MAP_SHADOW
+    #if !defined NETHER && defined PHOTONICS_ENABLED
 
         float fade = dot(pos_sc, pos_sc) / (far * far);
         float depth = textureLod(radiosity_direct, uv, 0.0).a;
@@ -252,10 +265,11 @@ void main()
         c7.g *= mix(depth, 1.0, min(1.0, fade));
 
     #endif
+    #endif
 
 
 
-    #if defined CLOUDS_SHADOWS
+    #if defined CLOUDS_SHADOWS && OVERWORLD
 
         // [null511] https://github.com/Null-MC
         // [fayer3]
@@ -354,6 +368,24 @@ void main()
 
     #endif
 
+    #if defined NETHER
+
+        // TODO: Justify a "sun", `b0_skybox.glsl`.
+        vec3 u_lightColor = vec3(0.8, 0.7, 0.6);
+        vec3 skyColor = vec3(1.0);
+        uv_lightmap.y = 1.0;
+
+    #endif
+
+    #if defined END
+
+        // TODO: Justify a "sun", `b0_skybox.glsl`.
+        vec3 u_lightColor = vec3(0.75, 0.7, 0.8);
+        vec3 skyColor = vec3(1.0);
+        uv_lightmap.y = 1.0;
+
+    #endif
+
     vec3 shading;
 
     // ambient
@@ -397,7 +429,6 @@ void main()
             float fog_end = isEyeInWater > 0 ? min(fogEnd, vxFar) : vxFar;
 
             fog = linearstep(fog_start, fog_end, pos_len); // 1 chunk = 16
-            fog = fog * fog;
 
         #endif
 
@@ -405,9 +436,17 @@ void main()
 
         #if defined FOG_HEIGHT
 
+            #define SEA_LEVEL 63.0
+
+            #if defined NETHER
+
+                #define SEA_LEVEL  31.0
+
+            #endif
+
             vec3 pos_ws = pos_sc + cameraPosition;
 
-            float height = abs(pos_ws.y - 63.0); // sea level = 63
+            float height = abs(pos_ws.y - SEA_LEVEL);
             height = linearstep(16.0, -16.0, height); // 1 chunk = 16
 
             // masks

@@ -37,6 +37,8 @@ void main()
 
 // =========
 
+
+
 // NOTE: We only use shadowtexN. There is no need to write shadowColorN.
 /* RENDERTARGETS: 0 */
 

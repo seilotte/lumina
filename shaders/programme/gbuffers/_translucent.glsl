@@ -392,7 +392,8 @@ void main()
 
 
 
-    #if defined MAP_SHADOW && defined PHOTONICS_ENABLED && 0
+    #if defined MAP_SHADOW && 0
+    #if !defined NETHER && defined PHOTONICS_ENABLED
 
         // NOTE: Only deferred geometry, therefore it looks wrong.
         float fade = dot(pos_sc, pos_sc) / (far * far);
@@ -401,10 +402,12 @@ void main()
         light *= mix(depth, 1.0, min(1.0, fade));
 
     #endif
+    #endif
 
 
 
-    #if defined MAP_SHADOW && !defined PHOTONICS_ENABLED
+    #if defined MAP_SHADOW
+    #if !defined NETHER && !defined PHOTONICS_ENABLED
 
         float pos_dist = dot(pos_sc, pos_sc);
         float max_dist = shadowDistance * shadowDistance;
@@ -425,16 +428,17 @@ void main()
             float depth = texture(shadowtex1, shadow_uv.xy).r;
 
             light *= 1.0 - fade * clamp(
-                3.0 * (depth - shadow_uv.z) / shadowProjection[2].z,
+                3.0 * (depth - shadow_uv.z) / sProj[2].z,
                 0.0, 1.0
             );
         }
 
     #endif
+    #endif
 
 
 
-    #if defined CLOUDS_SHADOWS
+    #if defined CLOUDS_SHADOWS && OVERWORLD
 
         // [null511] https://github.com/Null-MC
         // [fayer3]
@@ -509,6 +513,24 @@ void main()
     #define LIGHTS_STRENGTH 1.2
     #define EMISSIVE_STRENGTH 1.1
 
+    #if defined NETHER
+
+        // TODO: Justify a "sun", `b0_skybox.glsl`.
+        vec3 u_lightColor = vec3(0.8, 0.7, 0.6);
+        vec3 skyColor = vec3(1.0);
+        uv_lightmap.y = 1.0;
+
+    #endif
+
+    #if defined END
+
+        // TODO: Justify a "sun", `b0_skybox.glsl`.
+        vec3 u_lightColor = vec3(0.75, 0.7, 0.8);
+        vec3 skyColor = vec3(1.0);
+        uv_lightmap.y = 1.0;
+
+    #endif
+
     vec3 shading;
 
     // ambient
@@ -573,7 +595,6 @@ void main()
             float fog_end = isEyeInWater > 0 ? min(fogEnd, vxFar) : vxFar;
 
             fog = linearstep(fog_start, fog_end, pos_len); // 1 chunk = 16
-            fog = fog * fog;
 
         #endif
 
@@ -581,9 +602,17 @@ void main()
 
         #if defined FOG_HEIGHT
 
+            #define SEA_LEVEL 63.0
+
+            #if defined NETHER
+
+                #define SEA_LEVEL  31.0
+
+            #endif
+
             vec3 pos_ws = pos_sc + cameraPosition;
 
-            float height = abs(pos_ws.y - 63.0); // sea level = 63
+            float height = abs(pos_ws.y - SEA_LEVEL);
             height = linearstep(16.0, -16.0, height); // 1 chunk = 16
 
             // masks

@@ -21,7 +21,7 @@ void main()
 
 
 
-    gl_Position = proj4(mProj, mul3(mMV, vaPosition));
+    gl_Position = proj4(mProj, mul3(mMV, vaPosition * 0.5));
 //     gl_Position.x = gl_Position.x * 0.5 - gl_Position.w * 0.5; // downscale
 }
 
