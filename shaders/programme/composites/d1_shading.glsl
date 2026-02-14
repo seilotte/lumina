@@ -48,6 +48,9 @@ uniform sampler2D colortex7; // ao.r, shadows.g, pixel_age.b
 uniform sampler2D colortex8; // gi.rgb
 uniform sampler2D colortex10; // coloured_lights.rgb (previous)
 
+uniform sampler2D radiosity_direct; // photonics
+uniform sampler2D radiosity_handheld;
+
 const bool colortex1MipmapEnabled = true;
 
 // =========
@@ -110,12 +113,11 @@ void main()
 
     vec3 c0 = textureLod(colortex0, uv, 0.0).rgb;
     vec4 c1 = textureLod(colortex1, uv, 0.0);
-    uint c5 = texelFetch(colortex5, texel, 0).r;
+    float c3 = texelFetch(colortex3, texel, 0).r;
 
 
 
-    // NOTE: Not trully "is_sky", some gbuffers are missing.
-    if (c5 < 1u) // is_sky
+    if (c3 == 1.0) // is_sky
     {
         // [Builderb0y] https://github.com/Builderb0y
         // Stars.
@@ -182,32 +184,23 @@ void main()
         return;
     }
 
+
+
+    uint c5 = texelFetch(colortex5, texel, 0).r;
+
     vec2 c7 = vec2(1.0); // ao
     vec3 c8 = vec3(0.0); // gi
     vec3 c10 = vec3(1.0, 0.8, 0.6); // lights
 
 
 
-    vec3 pos_ss = vec3(uv, texelFetch(colortex3, texel, 0));
-    vec3 pos_vs = unproj3(gProjInv, pos_ss * 2.0 - 1.0);
+    vec3 pos_vs = unproj3(gProjInv, vec3(uv, c3) * 2.0 - 1.0);
     vec3 pos_sc = mul3(gMVInv, pos_vs);
 
-    vec2 uv_lightmap;
-    uv_lightmap.x = float((c5 >> 9u) & 31u) / 31.0;
-    uv_lightmap.y = float((c5 >> 4u) & 31u) / 31.0;
+    vec2 uv_lightmap = vec2((uvec2(c5) >> uvec2(9u, 4u)) & uvec2(31u)) / 31.0;
     float is_emissive = float((c5 >> 1u) & 7u) / 7.0;
 
 
-
-    #if defined LIGHTS_COLOURED
-
-        // NOTE: We cannot debug this here. Use the "final" programme.
-        vec2 uv_prev = get_prev_screen(pos_sc);
-
-        c10 = textureLod(colortex10, uv_prev, 0.0).rgb + vec3(1e-5, 8e-6, 6e-6);
-        c10 = c10 * inversesqrt(dot(c10, c10)); // normalize()
-
-    #endif
 
     #if (defined SS_AO || (defined SS_GI && SS_GI_MODE == 0)) && defined SS_SHADOWS
 
@@ -219,6 +212,8 @@ void main()
         c7.g = textureLod(colortex7, uv, 0.0).g;
 
     #endif
+
+
 
     #if defined SS_GI && SS_GI_MODE == 1
 
@@ -249,6 +244,17 @@ void main()
 
 
 
+    #if defined MAP_SHADOW && defined PHOTONICS_ENABLED
+
+        float fade = dot(pos_sc, pos_sc) / (far * far);
+        float depth = textureLod(radiosity_direct, uv, 0.0).a;
+
+        c7.g *= mix(depth, 1.0, min(1.0, fade));
+
+    #endif
+
+
+
     #if defined CLOUDS_SHADOWS
 
         // [null511] https://github.com/Null-MC
@@ -266,7 +272,31 @@ void main()
         uv_clouds /= 3072.0;
 
         // TODO: Cloud texture interpolation, linear.
-        c7.g *= 1.0 - texture(cloudtex, uv_clouds).r * uv_lightmap.y * 0.6;
+        c7.g *= 1.0 - texture(cloudtex, uv_clouds).r;
+
+    #endif
+
+
+
+    #if defined LIGHTS_COLOURED
+
+        {
+            // NOTE: We cannot debug this here. Use the "final" programme.
+            vec2 uv_prev = get_prev_screen(pos_sc);
+
+            c10 = textureLod(colortex10, uv_prev, 0.0).rgb + vec3(1e-5, 8e-6, 6e-6);
+            c10 *= inversesqrt(dot(c10, c10)) * uv_lightmap.x; // normalize()
+
+            #if defined PHOTONICS_ENABLED
+
+                // NOTE: Currently copper lights are not supported.
+                float fac = linearstep(far * 0.5, far, sqrt_fast(dot(pos_sc, pos_sc)));
+                vec3 col = textureLod(radiosity_direct, uv, 0.0).rgb;
+
+                c10 = mix(col, c10, fac);
+
+            #endif
+        }
 
     #endif
 
@@ -287,6 +317,15 @@ void main()
         light_hand2.r = 4.0 + 0.234 * heldBlockLightValue2;
         light_hand2.r = linearstep(light_hand2.r, 0.0, light_len);
         light_hand2.r *= min(1.0, float(heldBlockLightValue2));
+
+        #if defined PHOTONICS_ENABLED
+
+            light_len = textureLod(radiosity_handheld, uv, 0.0).r;
+
+            light_hand.r *= light_len;
+            light_hand2.r *= light_len;
+
+        #endif
 
         #if !defined LIGHTS_HAND_COLOURED
 
@@ -315,8 +354,6 @@ void main()
 
     #endif
 
-
-
     vec3 shading;
 
     // ambient
@@ -329,45 +366,23 @@ void main()
     shading += c8.rgb; // gi
 
     // lights
-    shading += (c10.rgb * uv_lightmap.x + light_hand + light_hand2)
+    shading += (c10.rgb + light_hand + light_hand2)
     * (LIGHTS_STRENGTH - light * skyColor.b);
 
     // finalize
-    #if !defined WHITE_WORLD
+    #if defined WHITE_WORLD
 
-        shading = mix(shading * c7.r, vec3(EMISSIVE_STRENGTH), is_emissive); // ao
-        shading *= c1.rgb; // albedo
+        shading = mix(shading * c7.r, vec3(EMISSIVE_STRENGTH) * c1.rgb, is_emissive);
 
     #else
 
-        shading = mix(shading * c7.r, vec3(EMISSIVE_STRENGTH) * c1.rgb, is_emissive);
+        shading = mix(shading * c7.r, vec3(EMISSIVE_STRENGTH), is_emissive); // ao
+        shading *= c1.rgb; // albedo
 
     #endif
 
 
 
-/*
-    if (uv.x < 0.5)
-    {
-        // Correct version.
-//         vec3 ambient = c7.r * u_skyColor * u_fogColor * AMBIENT_STRENGTH;
-        vec3 ambient = c7.r * fogColor * mix(10.0, 1.0, skyColor.b) * AMBIENT_STRENGTH;
-
-        vec3 light = u_lightColor.rgb;
-        light *= c1.a * c7.g * uv_lightmap.y * DIFFUSE_STRENGTH; // diffuse * shadows
-
-        light = c1.rgb * light + c1.rgb * c8.rgb; // diffuse + gi
-
-        vec3 lights = c10.rgb; // col
-        lights *= uv_lightmap.x * (LIGHTS_STRENGTH - skyColor.b);
-
-        shading = mix(ambient + light + lights, c1.rgb, is_emissive);
-    }
-//*/
-
-
-
-//*
     #if defined FOG_BORDER || defined FOG_HEIGHT
 
         float fog = 0.0;
@@ -418,7 +433,6 @@ void main()
         shading = mix(shading, c0, fog); // sky
 
     #endif
-//*/
 
 
 

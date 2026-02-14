@@ -111,6 +111,7 @@ option.DIS_FOLLIAGE = §6Folliage Displacement
 option.DIS_WATER = §6Water Displacement
 option.PIXELATE = §6Pixelate
 option.TAA = §6Temporal Anti-Aliasing §e[!]
+option.PHOTONICS_ENABLED = §6Photonics §e[!]
 
 # [Debug]
 option.DEBUG = §6Debug

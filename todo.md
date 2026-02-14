@@ -2,7 +2,7 @@
 
 ## Fixes
 - Screen space reflections (fog).
-- Optimizations (hi-z, fp16, etc.).
+- Photonics tanslucent "shadow map".
 
 ## Features
 - Lens flare.
@@ -11,6 +11,7 @@
 - Support the nether, the end.
 - Volumetric fog.
 - Water caustics (projected texture).
+- Optimizations (hi-z, fp16, etc.).
 
 ## Ideas
 - Pack specular map data into normal map.

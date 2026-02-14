@@ -143,6 +143,8 @@ uniform sampler2D depthtex1;
 
 uniform sampler2D colortex10; // coloured_lights.rgb (previous)
 
+uniform sampler2D radiosity_direct; // photonics
+
 // NOTE: colortex0 is bound, use the image.
 layout(binding = 0, rgba8) readonly uniform image2D colorimg0; // sky.rgb
 
@@ -390,7 +392,19 @@ void main()
 
 
 
-    #if defined MAP_SHADOW
+    #if defined MAP_SHADOW && defined PHOTONICS_ENABLED && 0
+
+        // NOTE: Only deferred geometry, therefore it looks wrong.
+        float fade = dot(pos_sc, pos_sc) / (far * far);
+        float depth = textureLod(radiosity_direct, gl_FragCoord.xy * u_viewResolution.zw, 0.0).a;
+
+        light *= mix(depth, 1.0, min(1.0, fade));
+
+    #endif
+
+
+
+    #if defined MAP_SHADOW && !defined PHOTONICS_ENABLED
 
         float pos_dist = dot(pos_sc, pos_sc);
         float max_dist = shadowDistance * shadowDistance;
@@ -508,14 +522,14 @@ void main()
     * (LIGHTS_STRENGTH - light * skyColor.b);
 
     // finalize
-    #if !defined WHITE_WORLD
+    #if defined WHITE_WORLD
 
-        shading = mix(shading, vec3(EMISSIVE_STRENGTH), is_emissive); // ao
-        albedo.rgb *= shading;
+        albedo.rgb = mix(shading, vec3(EMISSIVE_STRENGTH) * albedo.rgb, is_emissive);
 
     #else
 
-        albedo.rgb = mix(shading, vec3(EMISSIVE_STRENGTH) * albedo.rgb, is_emissive);
+        shading = mix(shading, vec3(EMISSIVE_STRENGTH), is_emissive); // ao
+        albedo.rgb *= shading;
 
     #endif
 

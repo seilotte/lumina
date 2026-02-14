@@ -175,6 +175,8 @@ const vec4 colortex6ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 
 // #define TAA
 
+// #define PHOTONICS_ENABLED
+
 
 
 // [Debug]
@@ -297,6 +299,8 @@ const vec4 colortex6ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 #endif
 #ifdef TAA
 #endif
+#ifdef PHOTONICS_ENABLED
+#endif
 
 #ifdef DEBUG
 #endif
@@ -317,4 +321,3 @@ const vec4 colortex6ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 #endif
 #ifdef RENDER_BEACON_BEAMS
 #endif
-

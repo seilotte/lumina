@@ -318,7 +318,7 @@ void main()
 
 
 
-    #if defined MAP_SHADOW
+    #if defined MAP_SHADOW && !defined PHOTONICS_ENABLED
 
         float pos_dist = dot(pos_sc, pos_sc);
         float max_dist = shadowDistance * shadowDistance;

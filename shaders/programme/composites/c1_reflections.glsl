@@ -143,6 +143,25 @@ void main()
 
 
 
+    #if defined FOG_BORDER
+
+        {
+            // TODO: Wrong, find a better solution.
+            float pos_len = sqrt_fast(dot(pos_vs, pos_vs));
+
+            float fog_start = isEyeInWater > 0 ? fogStart : 16.0;
+            float fog_end = isEyeInWater > 0 ? min(fogEnd, vxFar) : vxFar;
+
+            float fog = linearstep(fog_start, fog_end, pos_len);
+            fog = fog * fog;
+
+            mask *= 1.0 - fog;
+        }
+
+    #endif
+
+
+
     // Write.
     col9 = vec4(ssr, mask);
 
@@ -234,19 +253,22 @@ void main()
 
 
     #if defined FOG_BORDER
-    {
-        // TODO: Wrong, find a better solution.
-        float pos_len = sqrt_fast(dot(pos_vs, pos_vs));
 
-        float fog_start = isEyeInWater > 0 ? fogStart : 16.0;
-        float fog_end = isEyeInWater > 0 ? min(fogEnd, vxFar) : vxFar;
+        {
+            // TODO: Wrong, find a better solution.
+            float pos_len = sqrt_fast(dot(pos_vs, pos_vs));
 
-        float fog = linearstep(fog_start, fog_end, pos_len);
-        fog = fog * fog;
+            float fog_start = isEyeInWater > 0 ? fogStart : 16.0;
+            float fog_end = isEyeInWater > 0 ? min(fogEnd, vxFar) : vxFar;
 
-        mask *= 1.0 - fog;
-    }
+            float fog = linearstep(fog_start, fog_end, pos_len);
+            fog = fog * fog;
+
+            mask *= 1.0 - fog;
+        }
+
     #endif
+
 
 
     // Write.

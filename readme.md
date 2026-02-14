@@ -37,6 +37,7 @@ This shader was developed using the following versions:
 - [Sodium](https://modrinth.com/mod/sodium): 0.8.2 Fabric
 - [Iris](https://modrinth.com/mod/iris): 1.10.4 Fabric
 - [Voxy](https://modrinth.com/mod/voxy): 0.2.9 (Alpha) Fabric
+- [Photonics](https://modrinth.com/mod/photonics): 0.2.9 Fabric
 - [SPBR](https://modrinth.com/resourcepack/spbr): 19.6
 
 > [!NOTE]

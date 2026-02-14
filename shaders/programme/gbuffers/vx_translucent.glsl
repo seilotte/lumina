@@ -299,14 +299,14 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
     * (LIGHTS_STRENGTH - light * skyColor.b);
 
     // finalize
-    #if !defined WHITE_WORLD
+    #if defined WHITE_WORLD
 
-        shading = mix(shading, vec3(EMISSIVE_STRENGTH), is_emissive); // ao
-        albedo.rgb *= shading;
+        albedo.rgb = mix(shading, vec3(EMISSIVE_STRENGTH) * albedo.rgb, is_emissive);
 
     #else
 
-        albedo.rgb = mix(shading, vec3(EMISSIVE_STRENGTH) * albedo.rgb, is_emissive);
+        shading = mix(shading, vec3(EMISSIVE_STRENGTH), is_emissive); // ao
+        albedo.rgb *= shading;
 
     #endif
 

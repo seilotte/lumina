@@ -52,6 +52,10 @@ uniform sampler2D colortex9; // reflections.rgb, reflections_mask.a
 uniform sampler2D colortex10; // coloured_lights.rgb
 uniform sampler2D colortex11; // final_prev.rgb
 
+uniform sampler2D radiosity_direct; // photonics
+// uniform sampler2D radiosity_direct_soft;
+uniform sampler2D radiosity_handheld;
+
 // const bool colortex9MipmapEnabled = true;
 
 
@@ -326,6 +330,21 @@ void main()
 
             debug = c11.rgb;
             custom_text(0, (_F,_i,_n,_a,_l,_space,_P,_r,_e,_v,_i,_o,_u,_s), (_1,_1,_0), (_1,_1), (_a))
+
+        #elif DEBUG_MODE == 200
+
+            debug = texelFetch(radiosity_direct, texel, 0).rgb;
+            custom_text(0, (_P,_h,_o,_t,_o,_n,_i,_c,_s,_space,_L,_i,_g,_h,_t,_s), (_2,_0,_0), (_N), (_r,_g,_b));
+
+        #elif DEBUG_MODE == 201
+
+            debug = texelFetch(radiosity_direct, texel, 0).aaa;
+            custom_text(0, (_P,_h,_o,_t,_o,_n,_i,_c,_s,_space,_L,_i,_g,_h,_t,_space,_D,_i,_r), (_2,_0,_1), (_N), (_a));
+
+        #elif DEBUG_MODE == 210
+
+            debug = texelFetch(radiosity_handheld, texel, 0).rrr;
+            custom_text(0, (_P,_h,_o,_t,_o,_n,_i,_c,_s,_space,_L,_i,_g,_h,_t,_space,_H,_a,_n,_d), (_2,_1,_0), (_N), (_r));
 
         #else
 
