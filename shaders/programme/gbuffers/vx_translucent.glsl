@@ -240,7 +240,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
 
     // radiance
     float light = fma(dot(normal_sc, mat3(gMVInv) * u_shadowLightDirection), 0.6, 0.4);
-    light *= uv_lightmap.y; // NOTE: Should be applied to the ambient term.
+//     light *= uv_lightmap.y; // NOTE: Should be applied to the ambient term.
 
 
 
@@ -289,9 +289,11 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
     #if defined NETHER
 
         // TODO: Justify a "sun", `b0_skybox.glsl`.
+        #define AMBIENT_STRENGTH 0.5
+
         vec3 u_lightColor = vec3(0.8, 0.7, 0.6);
         vec3 skyColor = vec3(1.0);
-        uv_lightmap.y = 1.0;
+        uv_lightmap.y = max(uv_lightmap.y, 0.2);
 
     #endif
 
@@ -300,7 +302,6 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
         // TODO: Justify a "sun", `b0_skybox.glsl`.
         vec3 u_lightColor = vec3(0.75, 0.7, 0.8);
         vec3 skyColor = vec3(1.0);
-        uv_lightmap.y = 1.0;
 
     #endif
 
@@ -310,6 +311,8 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
     shading = fogColor * mix(10.0, 1.0, skyColor.b) * AMBIENT_STRENGTH;
 
     // light
+    light *= uv_lightmap.y;
+
     shading += u_lightColor.rgb * (light * DIFFUSE_STRENGTH);
 
     // lights

@@ -371,9 +371,11 @@ void main()
     #if defined NETHER
 
         // TODO: Justify a "sun", `b0_skybox.glsl`.
+        #define AMBIENT_STRENGTH 0.5
+
         vec3 u_lightColor = vec3(0.8, 0.7, 0.6);
         vec3 skyColor = vec3(1.0);
-        uv_lightmap.y = 1.0;
+        uv_lightmap.y = max(uv_lightmap.y, 0.2);
 
     #endif
 
@@ -382,7 +384,6 @@ void main()
         // TODO: Justify a "sun", `b0_skybox.glsl`.
         vec3 u_lightColor = vec3(0.75, 0.7, 0.8);
         vec3 skyColor = vec3(1.0);
-        uv_lightmap.y = 1.0;
 
     #endif
 
