@@ -4,6 +4,7 @@
 - Screen space reflections (fog).
 - Photonics translucent "shadow map".
 - Better support for the nether, the end.
+- Rain & Snow lighting.
 
 ## Features
 - Lens flare.
