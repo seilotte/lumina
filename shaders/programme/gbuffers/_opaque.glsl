@@ -321,6 +321,9 @@ void main()
     #if defined MAP_SHADOW
     #if !defined NETHER && !defined PHOTONICS_ENABLED
 
+        // [mateuskreuch] https://github.com/mateuskreuch/minecraft-miniature-shader
+        // Shadow Map Sampling.
+        // Modified.
         float pos_dist = dot(pos_sc, pos_sc);
         float max_dist = shadowDistance * shadowDistance;
 

@@ -234,7 +234,9 @@ void main()
     #elif defined SS_GI && SS_GI_MODE == 0
 
         {
+            // [rj200] https://github.com/rj200/Glamarye_Fast_Effects_for_ReShade
             // Fast Global Illumination.
+            // Inspired by this work.
 //             float gi_mip = max(0.167, (pos_vs.z + vxFar) / vxFar) * 6.0;
             float gi_mip = max(0.167, (pos_vs.z + 192.0) * 0.005208) * 6.0; // 12 chunks
 
@@ -248,7 +250,7 @@ void main()
             // albedo * diffuse * (1 - ao)
             c8 = gi_albedo.rgb * (1.0 - c7.r);
             c8 *= u_lightColor.rgb * gi_albedo.a;
-            c8 = c8 * 9.0; // pow(c8, vec3(1.2)) * 9.0
+            c8 = c8 * 6.0; // pow(c8, vec3(1.2)) * 6.0
             c8 = c8 / (c8 + 1.0);
         }
 
@@ -382,6 +384,8 @@ void main()
     #if defined END
 
         // TODO: Justify a "sun", `b0_skybox.glsl`.
+        #define AMBIENT_STRENGTH 1.0
+
         vec3 u_lightColor = vec3(0.75, 0.7, 0.8);
         vec3 skyColor = vec3(1.0);
 

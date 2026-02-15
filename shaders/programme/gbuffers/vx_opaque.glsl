@@ -92,6 +92,13 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
 
     vec4 albedo = parameters.tinting;
 
+    #if defined NETHER
+
+        // NOTE: TEMPORARY until fixed.
+        albedo.rgb = dot(albedo, vec4(1.0)) > 0.999 ? vec3(0.9) : albedo.rgb;
+
+    #endif
+
     #if defined MAP_ALBEDO
 
         albedo *= parameters.sampledColour;

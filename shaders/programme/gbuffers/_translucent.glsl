@@ -409,6 +409,9 @@ void main()
     #if defined MAP_SHADOW
     #if !defined NETHER && !defined PHOTONICS_ENABLED
 
+        // [] https://github.com/mateuskreuch/minecraft-miniature-shader
+        // Shadow Map Sampling.
+        // Modified.
         float pos_dist = dot(pos_sc, pos_sc);
         float max_dist = shadowDistance * shadowDistance;
 
@@ -527,6 +530,8 @@ void main()
     #if defined END
 
         // TODO: Justify a "sun", `b0_skybox.glsl`.
+        #define AMBIENT_STRENGTH 1.0
+
         vec3 u_lightColor = vec3(0.75, 0.7, 0.8);
         vec3 skyColor = vec3(1.0);
 

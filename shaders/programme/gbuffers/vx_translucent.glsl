@@ -123,6 +123,13 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
 
     vec4 albedo = parameters.tinting;
 
+    #if defined NETHER
+
+        // NOTE: TEMPORARY until fixed.
+        albedo.rgb = dot(albedo, vec4(1.0)) > 0.999 ? vec3(0.9) : albedo.rgb;
+
+    #endif
+
     #if defined MAP_ALBEDO
 
         albedo *= parameters.sampledColour;
@@ -300,6 +307,8 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
     #if defined END
 
         // TODO: Justify a "sun", `b0_skybox.glsl`.
+        #define AMBIENT_STRENGTH 1.0
+
         vec3 u_lightColor = vec3(0.75, 0.7, 0.8);
         vec3 skyColor = vec3(1.0);
 

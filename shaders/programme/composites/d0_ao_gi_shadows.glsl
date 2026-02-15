@@ -252,7 +252,7 @@ void main()
 
     #if defined SS_GI && SS_GI_MODE == 1
 
-        gi = (gi * rcp_iters) * 9.0; // intensity
+        gi = (gi * rcp_iters) * 6.0; // intensity
         gi = gi / (gi + 1.0);
 
     #endif
@@ -407,7 +407,7 @@ void main()
 
     #if defined SS_GI && SS_GI_MODE == 1
 
-        gi = (gi * rcp_dirs) * 9.0; // intensity
+        gi = (gi * rcp_dirs) * 6.0; // intensity
         gi = gi / (gi + 1.0);
 
     #endif
