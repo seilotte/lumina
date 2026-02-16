@@ -219,6 +219,10 @@ void main()
         // TODO: Upscale?
         c7 = textureLod(colortex7, uv, 0.0).rg;
 
+    #elif defined SS_AO || (defined SS_GI && SS_GI_MODE == 0)
+
+        c7.r = textureLod(colortex7, uv, 0.0).r;
+
     #elif defined SS_SHADOWS
 
         c7.g = textureLod(colortex7, uv, 0.0).g;
@@ -271,7 +275,7 @@ void main()
 
 
 
-    #if defined CLOUDS_SHADOWS && OVERWORLD
+    #if defined CLOUDS_SHADOWS && defined OVERWORLD
 
         // [null511] https://github.com/Null-MC
         // [fayer3]

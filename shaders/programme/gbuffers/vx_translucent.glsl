@@ -251,7 +251,7 @@ void voxy_emitFragment(VoxyFragmentParameters parameters)
 
 
 
-    #if defined CLOUDS_SHADOWS && OVERWORLD
+    #if defined CLOUDS_SHADOWS && defined OVERWORLD
 
         // [null511] https://github.com/Null-MC
         // [fayer3]
