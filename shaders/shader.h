@@ -175,13 +175,15 @@ const vec4 colortex6ClearColor = vec4(0.0, 0.0, 0.0, 0.0);
 
 // #define TAA
 
-// #define PHOTONICS_ENABLED
+#if defined PHOTONICS
+    #define PHOTONICS_ENABLED
+#endif
 
 
 
 // [Debug]
 // #define DEBUG
-    #define DEBUG_MODE -1 // [-1 0 10 11 30 31 50 51 52 53 54 55 70 71 72 80 90 91 100 110]
+    #define DEBUG_MODE -1 // [-1 0 10 11 30 31 50 51 52 53 54 55 70 71 72 80 90 91 100 110 200 201 210]
 
 // #define WHITE_WORLD
 

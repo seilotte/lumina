@@ -1,0 +1,1389 @@
+/*
+    TODO:
+        - Use the same colours for hand(s) light(s).
+
+    radius:
+        - light.attenuation.y = 1 / radius
+        - affects rt
+    intensity:
+        - light.color *= (intensity / 100)
+    falloff:
+        - light.falloff = falloff
+        - idk, docs say [0, 1]
+*/
+
+{
+    "lights": {
+        "minecraft": {
+            "radius": 15,
+            "intensity": 100,
+            "falloff": 1,
+            "color": "#ffffff",
+            "is_traced": true,
+            "overrides": {
+                "light_0": {
+                    "radius": 15,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=15]"
+                    ]
+                },
+                "light_1": {
+                    "radius": 15,
+                    "color": "rgb(0.45, 0.53, 0.65)",
+                    "blocks": [
+                        "minecraft:beacon"
+                    ]
+                },
+                "light_2": {
+                    "radius": 15,
+                    "color": "rgb(0.45, 0.73, 1.0)",
+                    "blocks": [
+                        "minecraft:conduit"
+                    ]
+                },
+                "light_3": {
+                    "radius": 15,
+                    "color": "rgb(0.57, 0.78, 0.58)",
+                    "blocks": [
+                        "minecraft:copper_lantern"
+                    ]
+                },
+                "light_4": {
+                    "radius": 15,
+                    "color": "rgb(0.57, 0.78, 0.58)",
+                    "blocks": [
+                        "minecraft:exposed_copper_lantern"
+                    ]
+                },
+                "light_5": {
+                    "radius": 15,
+                    "color": "rgb(0.57, 0.78, 0.58)",
+                    "blocks": [
+                        "minecraft:weathered_copper_lantern"
+                    ]
+                },
+                "light_6": {
+                    "radius": 15,
+                    "color": "rgb(0.57, 0.78, 0.58)",
+                    "blocks": [
+                        "minecraft:oxidized_copper_lantern"
+                    ]
+                },
+                "light_7": {
+                    "radius": 15,
+                    "color": "rgb(0.57, 0.78, 0.58)",
+                    "blocks": [
+                        "minecraft:waxed_copper_lantern"
+                    ]
+                },
+                "light_8": {
+                    "radius": 15,
+                    "color": "rgb(0.57, 0.78, 0.58)",
+                    "blocks": [
+                        "minecraft:waxed_exposed_copper_lantern"
+                    ]
+                },
+                "light_9": {
+                    "radius": 15,
+                    "color": "rgb(0.57, 0.78, 0.58)",
+                    "blocks": [
+                        "minecraft:waxed_weathered_copper_lantern"
+                    ]
+                },
+                "light_10": {
+                    "radius": 15,
+                    "color": "rgb(0.57, 0.78, 0.58)",
+                    "blocks": [
+                        "minecraft:waxed_oxidized_copper_lantern"
+                    ]
+                },
+                "light_11": {
+                    "radius": 15,
+                    "color": "rgb(0.67, 0.67, 0.67)",
+                    "blocks": [
+                        "minecraft:end_gateway"
+                    ]
+                },
+                "light_12": {
+                    "radius": 15,
+                    "color": "rgb(0.67, 0.67, 0.67)",
+                    "blocks": [
+                        "minecraft:end_portal"
+                    ]
+                },
+                "light_13": {
+                    "radius": 15,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:fire"
+                    ]
+                },
+                "light_14": {
+                    "radius": 15,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:sea_pickle[pickles=4, waterlogged=true]"
+                    ]
+                },
+                "light_15": {
+                    "radius": 15,
+                    "color": "rgb(0.59, 0.86, 0.53)",
+                    "blocks": [
+                        "minecraft:ochre_froglight"
+                    ]
+                },
+                "light_16": {
+                    "radius": 15,
+                    "color": "rgb(0.57, 0.77, 0.51)",
+                    "blocks": [
+                        "minecraft:verdant_froglight"
+                    ]
+                },
+                "light_17": {
+                    "radius": 15,
+                    "color": "rgb(0.7, 0.54, 0.74)",
+                    "blocks": [
+                        "minecraft:pearlescent_froglight"
+                    ]
+                },
+                "light_18": {
+                    "radius": 15,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:glowstone"
+                    ]
+                },
+                "light_19": {
+                    "radius": 15,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:jack_o_lantern"
+                    ]
+                },
+                "light_20": {
+                    "radius": 15,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:lantern"
+                    ]
+                },
+                "light_21": {
+                    "radius": 15,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:lava"
+                    ]
+                },
+                "light_22": {
+                    "radius": 15,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:lava_cauldron"
+                    ]
+                },
+                "light_23": {
+                    "radius": 15,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:campfire[lit=true]"
+                    ]
+                },
+                "light_24": {
+                    "radius": 15,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:redstone_lamp[lit=true]"
+                    ]
+                },
+                "light_25": {
+                    "radius": 15,
+                    "color": "rgb(0.51, 0.03, 0.89)",
+                    "blocks": [
+                        "minecraft:respawn_anchor[charges=4]"
+                    ]
+                },
+                "light_26": {
+                    "radius": 15,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:sea_lantern"
+                    ]
+                },
+                "light_27": {
+                    "radius": 15,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:shroomlight"
+                    ]
+                },
+                "light_28": {
+                    "radius": 15,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:copper_bulb[lit=true]"
+                    ]
+                },
+                "light_29": {
+                    "radius": 15,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:waxed_copper_bulb[lit=true]"
+                    ]
+                },
+                "light_30": {
+                    "radius": 14,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=14]"
+                    ]
+                },
+                "light_31": {
+                    "radius": 14,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:cave_vines_plant[berries=true]"
+                    ]
+                },
+                "light_32": {
+                    "radius": 14,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:cave_vines[berries=true]"
+                    ]
+                },
+                "light_33": {
+                    "radius": 14,
+                    "color": "rgb(0.57, 0.78, 0.58)",
+                    "blocks": [
+                        "minecraft:copper_torch",
+                        "minecraft:copper_wall_torch"
+                    ]
+                },
+                "light_35": {
+                    "radius": 14,
+                    "color": "rgb(0.67, 0.67, 0.67)",
+                    "blocks": [
+                        "minecraft:end_rod"
+                    ]
+                },
+                "light_36": {
+                    "radius": 14,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:torch",
+                        "minecraft:wall_torch"
+                    ]
+                },
+                "light_38": {
+                    "radius": 13,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=13]"
+                    ]
+                },
+                "light_39": {
+                    "radius": 13,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:furnace[lit=true]"
+                    ]
+                },
+                "light_40": {
+                    "radius": 13,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:blast_furnace[lit=true]"
+                    ]
+                },
+                "light_41": {
+                    "radius": 13,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:smoker[lit=true]"
+                    ]
+                },
+                "light_42": {
+                    "radius": 12,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=12]"
+                    ]
+                },
+                "light_43": {
+                    "radius": 6,
+                    "color": "rgb(0.2, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:vault[vault_state=active]"
+                    ]
+                },
+                "light_44": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_45": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:white_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_46": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:light_gray_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_47": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:gray_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_48": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:black_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_49": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:brown_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_50": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:red_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_51": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:orange_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_52": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:yellow_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_53": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:lime_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_54": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:green_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_55": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:cyan_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_56": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:light_blue_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_57": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:blue_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_58": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:purple_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_59": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:magenta_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_60": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:pink_candle[candles=4, lit=true]"
+                    ]
+                },
+                "light_61": {
+                    "radius": 12,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:sea_pickle[pickles=3, waterlogged=true]"
+                    ]
+                },
+                "light_62": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:exposed_copper_bulb[lit=true]"
+                    ]
+                },
+                "light_63": {
+                    "radius": 12,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:waxed_exposed_copper_bulb[lit=true]"
+                    ]
+                },
+                "light_64": {
+                    "radius": 11,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=11]"
+                    ]
+                },
+                "light_65": {
+                    "radius": 11,
+                    "color": "rgb(0.51, 0.03, 0.89)",
+                    "blocks": [
+                        "minecraft:nether_portal"
+                    ]
+                },
+                "light_66": {
+                    "radius": 11,
+                    "color": "rgb(0.51, 0.03, 0.89)",
+                    "blocks": [
+                        "minecraft:respawn_anchor[charges=3]"
+                    ]
+                },
+                "light_67": {
+                    "radius": 10,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=10]"
+                    ]
+                },
+                "light_68": {
+                    "radius": 10,
+                    "color": "rgb(0.51, 0.03, 0.89)",
+                    "blocks": [
+                        "minecraft:crying_obsidian"
+                    ]
+                },
+                "light_69": {
+                    "radius": 10,
+                    "color": "rgb(0.2, 0.8, 1.0)",
+                    "blocks": [
+                        "minecraft:soul_campfire[lit=true]"
+                    ]
+                },
+                "light_70": {
+                    "radius": 10,
+                    "color": "rgb(0.2, 0.8, 1.0)",
+                    "blocks": [
+                        "minecraft:soul_fire"
+                    ]
+                },
+                "light_71": {
+                    "radius": 10,
+                    "color": "rgb(0.2, 0.8, 1.0)",
+                    "blocks": [
+                        "minecraft:soul_lantern"
+                    ]
+                },
+                "light_72": {
+                    "radius": 10,
+                    "color": "rgb(0.2, 0.8, 1.0)",
+                    "blocks": [
+                        "minecraft:soul_torch",
+                        "minecraft:soul_wall_torch"
+                    ]
+                },
+                "light_74": {
+                    "radius": 9,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=9]"
+                    ]
+                },
+                "light_75": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_76": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:white_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_77": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:light_gray_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_78": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:gray_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_79": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:black_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_80": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:brown_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_81": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:red_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_82": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:orange_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_83": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:yellow_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_84": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:lime_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_85": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:green_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_86": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:cyan_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_87": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:light_blue_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_88": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:blue_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_89": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:purple_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_90": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:magenta_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_91": {
+                    "radius": 9,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:pink_candle[candles=3, lit=true]"
+                    ]
+                },
+                "light_92": {
+                    "radius": 9,
+                    "color": "rgb(1.0, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:deepslate_redstone_ore[lit=true]"
+                    ]
+                },
+                "light_93": {
+                    "radius": 9,
+                    "color": "rgb(1.0, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:redstone_ore[lit=true]"
+                    ]
+                },
+                "light_94": {
+                    "radius": 9,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:sea_pickle[pickles=2, waterlogged=true]"
+                    ]
+                },
+                "light_95": {
+                    "radius": 8,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=8]"
+                    ]
+                },
+                "light_96": {
+                    "radius": 8,
+                    "color": "rgb(0.2, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:trial_spawner[trial_spawner_state=active]"
+                    ]
+                },
+                "light_97": {
+                    "radius": 8,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:weathered_copper_bulb[lit=true]"
+                    ]
+                },
+                "light_98": {
+                    "radius": 8,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:waxed_weathered_copper_bulb[lit=true]"
+                    ]
+                },
+                "light_99": {
+                    "radius": 7,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=7]"
+                    ]
+                },
+                "light_100": {
+                    "radius": 7,
+                    "color": "rgb(0.5, 0.28, 0.0)",
+                    "blocks": [
+                        "minecraft:enchanting_table"
+                    ]
+                },
+                "light_101": {
+                    "radius": 7,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:ender_chest"
+                    ]
+                },
+                "light_102": {
+                    "radius": 7,
+                    "color": "rgb(0.44, 0.53, 0.49)",
+                    "blocks": [
+                        "minecraft:glow_lichen"
+                    ]
+                },
+                "light_103": {
+                    "radius": 7,
+                    "color": "rgb(1.0, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:redstone_torch[lit=true]",
+                        "minecraft:redstone_wall_torch[lit=true]"
+                    ]
+                },
+                "light_105": {
+                    "radius": 7,
+                    "color": "rgb(0.51, 0.03, 0.89)",
+                    "blocks": [
+                        "minecraft:respawn_anchor[charges=2]"
+                    ]
+                },
+                "light_106": {
+                    "radius": 6,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=6]"
+                    ]
+                },
+                "light_107": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_108": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:white_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_109": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:light_gray_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_110": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:gray_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_111": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:black_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_112": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:brown_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_113": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:red_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_114": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:orange_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_115": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:yellow_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_116": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:lime_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_117": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:green_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_118": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:cyan_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_119": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:light_blue_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_120": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:blue_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_121": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:purple_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_122": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:magenta_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_123": {
+                    "radius": 6,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:pink_candle[candles=2, lit=true]"
+                    ]
+                },
+                "light_124": {
+                    "radius": 6,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:sea_pickle[pickles=1, waterlogged=true]"
+                    ]
+                },
+                "light_125": {
+                    "radius": 6,
+                    "color": "rgb(0.15, 0.52, 0.57)",
+                    "blocks": [
+                        "minecraft:sculk_catalyst"
+                    ]
+                },
+                "light_126": {
+                    "radius": 6,
+                    "color": "rgb(0.2, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:vault[vault_state=inactive]"
+                    ]
+                },
+                "light_127": {
+                    "radius": 5,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=5]"
+                    ]
+                },
+                "light_128": {
+                    "radius": 5,
+                    "color": "rgb(0.48, 0.36, 0.71)",
+                    "blocks": [
+                        "minecraft:amethyst_cluster"
+                    ]
+                },
+                "light_129": {
+                    "radius": 4,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=4]"
+                    ]
+                },
+                "light_130": {
+                    "radius": 4,
+                    "color": "rgb(0.48, 0.36, 0.71)",
+                    "blocks": [
+                        "minecraft:large_amethyst_bud"
+                    ]
+                },
+                "light_131": {
+                    "radius": 4,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:oxidized_copper_bulb[lit=true]"
+                    ]
+                },
+                "light_132": {
+                    "radius": 4,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:waxed_oxidized_copper_bulb[lit=true]"
+                    ]
+                },
+                "light_133": {
+                    "radius": 4,
+                    "color": "rgb(0.2, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:trial_spawner[trial_spawner_state=waiting_for_players]"
+                    ]
+                },
+                "light_134": {
+                    "radius": 4,
+                    "color": "rgb(0.2, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:trial_spawner[trial_spawner_state=waiting_for_reward_ejection]"
+                    ]
+                },
+                "light_135": {
+                    "radius": 3,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=3]"
+                    ]
+                },
+                "light_136": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_137": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:white_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_138": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:light_gray_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_139": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:gray_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_140": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:black_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_141": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:brown_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_142": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:red_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_143": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:orange_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_144": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:yellow_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_145": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:lime_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_146": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:green_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_147": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:cyan_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_148": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:light_blue_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_149": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:blue_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_150": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:purple_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_151": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:magenta_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_152": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:pink_candle[candles=1, lit=true]"
+                    ]
+                },
+                "light_153": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:candle_cake[lit=true]"
+                    ]
+                },
+                "light_154": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:white_candle_cake[lit=true]"
+                    ]
+                },
+                "light_155": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:light_gray_candle_cake[lit=true]"
+                    ]
+                },
+                "light_156": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:gray_candle_cake[lit=true]"
+                    ]
+                },
+                "light_157": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:black_candle_cake[lit=true]"
+                    ]
+                },
+                "light_158": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:brown_candle_cake[lit=true]"
+                    ]
+                },
+                "light_159": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:red_candle_cake[lit=true]"
+                    ]
+                },
+                "light_160": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:orange_candle_cake[lit=true]"
+                    ]
+                },
+                "light_161": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:yellow_candle_cake[lit=true]"
+                    ]
+                },
+                "light_162": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:lime_candle_cake[lit=true]"
+                    ]
+                },
+                "light_163": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:green_candle_cake[lit=true]"
+                    ]
+                },
+                "light_164": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:cyan_candle_cake[lit=true]"
+                    ]
+                },
+                "light_165": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:light_blue_candle_cake[lit=true]"
+                    ]
+                },
+                "light_166": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:blue_candle_cake[lit=true]"
+                    ]
+                },
+                "light_167": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:purple_candle_cake[lit=true]"
+                    ]
+                },
+                "light_168": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:magenta_candle_cake[lit=true]"
+                    ]
+                },
+                "light_169": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:pink_candle_cake[lit=true]"
+                    ]
+                },
+                "light_170": {
+                    "radius": 3,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:magma_block"
+                    ]
+                },
+                "light_171": {
+                    "radius": 3,
+                    "color": "rgb(0.51, 0.03, 0.89)",
+                    "blocks": [
+                        "minecraft:respawn_anchor[charges=1]"
+                    ]
+                },
+                "light_172": {
+                    "radius": 2,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=2]"
+                    ]
+                },
+                "light_173": {
+                    "radius": 2,
+                    "color": "rgb(0.48, 0.36, 0.71)",
+                    "blocks": [
+                        "minecraft:medium_amethyst_bud"
+                    ]
+                },
+                "light_174": {
+                    "radius": 2,
+                    "color": "rgb(0.91, 0.77, 0.6)",
+                    "blocks": [
+                        "minecraft:firefly_bush"
+                    ]
+                },
+                "light_175": {
+                    "radius": 1,
+                    "color": "rgb(0.39, 0.39, 0.39)",
+                    "blocks": [
+                        "minecraft:light[level=1]"
+                    ]
+                },
+                "light_176": {
+                    "radius": 1,
+                    "color": "rgb(0.47, 0.42, 0.22)",
+                    "blocks": [
+                        "minecraft:brewing_stand"
+                    ]
+                },
+                "light_177": {
+                    "radius": 1,
+                    "color": "rgb(0.59, 0.43, 0.3)",
+                    "blocks": [
+                        "minecraft:brown_mushroom"
+                    ]
+                },
+                "light_178": {
+                    "radius": 1,
+                    "color": "rgb(0.15, 0.52, 0.57)",
+                    "blocks": [
+                        "minecraft:calibrated_sculk_sensor"
+                    ]
+                },
+                "light_179": {
+                    "radius": 1,
+                    "color": "rgb(0.2, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:dragon_egg"
+                    ]
+                },
+                "light_180": {
+                    "radius": 1,
+                    "color": "rgb(0.67, 0.67, 0.67)",
+                    "blocks": [
+                        "minecraft:end_portal_frame"
+                    ]
+                },
+                "light_181": {
+                    "radius": 1,
+                    "color": "rgb(0.15, 0.52, 0.57)",
+                    "blocks": [
+                        "minecraft:sculk_sensor"
+                    ]
+                },
+                "light_182": {
+                    "radius": 1,
+                    "color": "rgb(0.48, 0.36, 0.71)",
+                    "blocks": [
+                        "minecraft:small_amethyst_bud"
+                    ]
+                },
+                "light_183": {
+                    "radius": 14,
+                    "color": "rgb(0.85, 0.35, 0.1)",
+                    "blocks": [
+                        "minecraft:torchflower",
+                        "minecraft:torchflower_crop"
+                    ],
+                    "is_traced": true
+                },
+                "light_185": {
+                    "radius": 10,
+                    "color": "rgb(0.1, 0.2, 0.3)",
+                    "blocks": [
+                        "minecraft:pitcher_plant",
+                        "minecraft:pitcher_crop"
+                    ],
+                    "is_traced": true
+                },
+                "light_187": {
+                    "radius": 14,
+                    "color": "rgb(1.0, 0.5, 0.25)",
+                    "blocks": [
+                        "minecraft:open_eyeblossom"
+                    ],
+                    "is_traced": false
+                },
+                "light_188": {
+                    "radius": 7,
+                    "color": "rgb(1.0, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:repeater[powered=true]"
+                    ],
+                    "is_traced": true
+                },
+                "light_189": {
+                    "radius": 7,
+                    "color": "rgb(1.0, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:comparator[powered=true]",
+                        "minecraft:comparator[mode=subtract]"
+                    ],
+                    "is_traced": true
+                },
+                "light_191": {
+                    "radius": 7,
+                    "color": "rgb(1.0, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:redstone_wire[power=1]",
+                        "minecraft:redstone_wire[power=2]",
+                        "minecraft:redstone_wire[power=3]",
+                        "minecraft:redstone_wire[power=4]",
+                        "minecraft:redstone_wire[power=5]",
+                        "minecraft:redstone_wire[power=6]",
+                        "minecraft:redstone_wire[power=7]",
+                        "minecraft:redstone_wire[power=8]",
+                        "minecraft:redstone_wire[power=9]",
+                        "minecraft:redstone_wire[power=10]",
+                        "minecraft:redstone_wire[power=11]",
+                        "minecraft:redstone_wire[power=12]",
+                        "minecraft:redstone_wire[power=13]",
+                        "minecraft:redstone_wire[power=14]",
+                        "minecraft:redstone_wire[power=15]"
+                    ],
+                    "is_traced": false
+                },
+                "light_192": {
+                    "radius": 1,
+                    "color": "rgb(0.89, 0.93, 0.89)",
+                    "blocks": [
+                        "minecraft:sculk_shrieker"
+                    ],
+                    "is_traced": false
+                },
+                "light_193": {
+                    "radius": 15,
+                    "color": "rgb(0.48, 0.36, 0.71)",
+                    "blocks": [
+                        "minecraft:amethyst_block"
+                    ],
+                    "is_traced": false
+                },
+                "light_194": {
+                    "radius": 15,
+                    "color": "rgb(0.09, 0.87, 0.38)",
+                    "blocks": [
+                        "minecraft:emerald_block"
+                    ],
+                    "is_traced": false
+                },
+                "light_195": {
+                    "radius": 15,
+                    "color": "rgb(0.11, 0.29, 0.58)",
+                    "blocks": [
+                        "minecraft:lapis_block"
+                    ],
+                    "is_traced": false
+                },
+                "light_196": {
+                    "radius": 15,
+                    "color": "rgb(1.0, 0.2, 0.2)",
+                    "blocks": [
+                        "minecraft:redstone_block"
+                    ],
+                    "is_traced": false
+                }
+            }
+        }
+    }
+}

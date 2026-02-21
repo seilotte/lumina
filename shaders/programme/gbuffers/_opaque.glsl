@@ -319,7 +319,7 @@ void main()
 
 
     #if defined MAP_SHADOW
-    #if !defined NETHER && !defined PHOTONICS_ENABLED
+    #if !defined NETHER
 
         // [mateuskreuch] https://github.com/mateuskreuch/minecraft-miniature-shader
         // Shadow Map Sampling.

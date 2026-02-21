@@ -117,7 +117,7 @@ vec3 get_prev_screen(vec3 p)
     ) / (gPrevProj[2].w * p.z);
 
     // prev_ndc -> prev_screen
-    return p * 0.5 + 0.5;
+    return vec3(p.xy * 0.5 + 0.5, 0.0);
 }
 
 // =========
@@ -525,6 +525,7 @@ void main()
     if (clamp(uv_prev.xy, 0., 1.) != uv_prev.xy) return;
 
     vec3 c7 = textureLod(colortex7, uv_prev.xy, 0.0).rgb; // ao_prev.r, shadows_prev.g, pixel_age_prev.b
+    uv_prev.z = texelFetch(colortex3, ivec2(uv_prev.xy * resolution), 0).r
 
 
 

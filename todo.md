@@ -2,7 +2,11 @@
 
 ## Fixes
 - Screen space reflections (fog).
-- Photonics translucent "shadow map".
+- Better Photonics implemantion.
+    - Translucent -> Shadows.
+    - Remove extra buffers.
+    - World-Space reflections.
+    - Equal lights colours.
 - Better support for the nether, the end.
 - Rain & Snow lighting.
 

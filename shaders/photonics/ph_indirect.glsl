@@ -1,7 +1,4 @@
-#file "/photonics/ph_indirect.glsl"
-#create
-
-#version 430
+#include "/programme/_lib/version.glsl"
 
 // =========
 

@@ -1,9 +1,8 @@
-#file "/photonics/ph_screen.glsl"
-#create
-
-#version 430
+#include "/programme/_lib/version.glsl"
 
 layout(location = 0) in vec3 position;
+
+out vec2 uv;
 
 // =========
 
@@ -11,5 +10,9 @@ layout(location = 0) in vec3 position;
 
 void main()
 {
+    uv = position.xy;
+
+
+
     gl_Position = vec4(position.xy * 2.0 - 1.0, 0.0, 1.0);
 }

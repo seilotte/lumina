@@ -330,11 +330,11 @@ void main()
         vec3 pos_hand = (pos_sc + cameraPosition) - eyePosition;
         float light_len = sqrt_fast(dot(pos_hand, pos_hand));
 
-        light_hand.r = 4.0 + 0.234 * heldBlockLightValue; // mix(4, 8, v / 15)
+        light_hand.r = 4.0 + 0.734 * heldBlockLightValue; // mix(4, 15, v / 15)
         light_hand.r = linearstep(light_hand.r, 0.0, light_len);
         light_hand.r *= min(1.0, float(heldBlockLightValue));
 
-        light_hand2.r = 4.0 + 0.234 * heldBlockLightValue2;
+        light_hand2.r = 4.0 + 0.734 * heldBlockLightValue2;
         light_hand2.r = linearstep(light_hand2.r, 0.0, light_len);
         light_hand2.r *= min(1.0, float(heldBlockLightValue2));
 

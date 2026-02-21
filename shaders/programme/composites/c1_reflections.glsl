@@ -274,6 +274,33 @@ void main()
 
 #endif
 //*/
+
+
+
+/*
+#if defined PHOTONICS_ENABLED
+
+    vec3 pos_sc = mul3(gMVInv, pos_vs);
+    vec3 normal_sc = mul3(gMVInv, normal_vs);
+    vec3 ref_sc = mul3(gMVInv, ref_vs);
+
+    RayJob ray = RayJob(vec3(0), vec3(0), vec3(0), vec3(0), vec3(0), false);
+
+    RAY_ITERATION_COUNT = 20; // from ph_raytracing.glsl
+
+    ray.origin = pos_sc + normal_sc * 0.01 + (cameraPosition - world_offset);
+    ray.direction = ref_sc;
+
+    trace_ray(ray, true);
+
+    if (ray.result_hit)
+    {
+        // TODO: Do lighting.
+        col9.rgb = ray.result_color; // albedo
+    }
+
+#endif
+//*/
 }
 
 #endif
