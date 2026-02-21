@@ -525,7 +525,7 @@ void main()
     if (clamp(uv_prev.xy, 0., 1.) != uv_prev.xy) return;
 
     vec3 c7 = textureLod(colortex7, uv_prev.xy, 0.0).rgb; // ao_prev.r, shadows_prev.g, pixel_age_prev.b
-    uv_prev.z = texelFetch(colortex3, ivec2(uv_prev.xy * resolution), 0).r
+    uv_prev.z = texelFetch(colortex3, ivec2(uv_prev.xy * resolution), 0).r;
 
 
 
